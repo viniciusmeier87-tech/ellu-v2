@@ -1,0 +1,19 @@
+{
+  "name": "Éllu Ambiental",
+  "short_name": "Éllu",
+  "description": "Gestão de laboratório ambiental ISO 17025",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0F6E56",
+  "theme_color": "#0F6E56",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
