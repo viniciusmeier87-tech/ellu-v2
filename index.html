@@ -2216,6 +2216,12 @@ window.addEventListener('appinstalled',function(){ toast('✅ App instalado!'); 
   // Preencher select assim que DOM estiver pronto
   document.addEventListener('DOMContentLoaded', function(){
     carregarLoginSelect();
+    iniciarSincronizacaoRealtime();
+
+    // Registrar Service Worker para PWA
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/ellu-v2/sw.js').catch(function(){});
+    }
   });
 })();
 </script>
