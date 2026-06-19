@@ -29,17 +29,19 @@ if('serviceWorker' in navigator){
 <link rel="manifest" href="/manifest.json">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-<!-- Firebase removido temporariamente para debug -->
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// Stub do Firestore — não bloqueia nada
-var db = {
-  collection: function(){ return { doc: function(){ return {
-    set: function(){ return Promise.resolve(); },
-    get: function(){ return Promise.resolve({exists:false, data:function(){return null;}}); },
-    onSnapshot: function(ok,err){ return function(){}; }
-  }; } };
-  }
-};
+firebase.initializeApp({
+  apiKey: "AIzaSyD_rx_uE5b40Aeze4xhCMIEdZCzqe0cqQo",
+  authDomain: "ellu-ambiental.firebaseapp.com",
+  projectId: "ellu-ambiental",
+  storageBucket: "ellu-ambiental.firebasestorage.app",
+  messagingSenderId: "1077027849070",
+  appId: "1:1077027849070:web:67b8340f5a0c9fca70b77f"
+});
+var db = firebase.firestore();
 </script>
 <style>
 :root{
