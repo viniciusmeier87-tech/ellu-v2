@@ -10,7 +10,2253 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><!DOCTYPE html>
+<html lang="pt-BR"><!DOCTYPE html>
 <html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Éllu Ambiental">
+<meta name="theme-color" content="#0F6E56">
+<title>Éllu Ambiental — ISO 17025</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyD_rx_uE5b40Aeze4xhCMIEdZCzqe0cqQo",
+  authDomain: "ellu-ambiental.firebaseapp.com",
+  projectId: "ellu-ambiental",
+  storageBucket: "ellu-ambiental.firebasestorage.app",
+  messagingSenderId: "1077027849070",
+  appId: "1:1077027849070:web:67b8340f5a0c9fca70b77f"
+});
+var db = firebase.firestore();
+</script>
+<style>
+:root{
+  --g:#0F6E56;--g2:#085041;--gbg:#E1F5EE;--gtx:#085041;
+  --abg:#FAEEDA;--atx:#633806;
+  --rbg:#FCEBEB;--rtx:#791F1F;
+  --bbg:#E6F1FB;--btx:#0C447C;
+  --pbg:#EEEDFE;--ptx:#3C3489;
+  --xbg:#F1EFE8;--xtx:#444441;
+  --bg:#fff;--bg2:#f6f6f4;--bg3:#eeecea;
+  --tx:#111;--tx2:#666;--tx3:#aaa;
+  --bd:rgba(0,0,0,0.10);--bd2:rgba(0,0,0,0.18);
+  --r:10px;--rl:14px;
+  --sb:env(safe-area-inset-bottom,0px);
+  --st:env(safe-area-inset-top,0px);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1a;--bg2:#252523;--bg3:#2c2c2a;
+  --tx:#f0f0ec;--tx2:#a0a09b;--tx3:#555;
+  --bd:rgba(255,255,255,0.09);--bd2:rgba(255,255,255,0.16);
+  --gbg:#04342C;--gtx:#9FE1CB;--abg:#412402;--atx:#FAC775;
+  --rbg:#501313;--rtx:#F7C1C1;--bbg:#042C53;--btx:#B5D4F4;
+  --pbg:#26215C;--ptx:#CECBF6;--xbg:#2C2C2A;--xtx:#D3D1C7;
+}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--tx)}
+body{display:flex;flex-direction:column}
+.tb{background:var(--g);color:#fff;padding:10px 14px;padding-top:calc(10px + var(--st));display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:9px}
+.tb-logo{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.tb-name{font-size:15px;font-weight:600}
+.tb-sub{font-size:9.5px;opacity:.75;margin-top:1px}
+.tb-r{display:flex;gap:7px}
+.ib{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+.ib:active{background:rgba(255,255,255,0.3)}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(62px + var(--sb))}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--bd);display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:var(--sb);z-index:100}
+.bnav.admin-mode{grid-template-columns:repeat(8,1fr)}
+.ni{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px 5px;color:var(--tx3);cursor:pointer;border:none;background:none;gap:2px;font-family:inherit}
+.ni.on{color:var(--g)}
+.ni i{font-size:20px}
+.ni span{font-size:9px;font-weight:500;white-space:nowrap}
+.pg{display:none;padding:12px 12px 0}
+.pg.on{display:block}
+.card{background:var(--bg);border-radius:var(--rl);border:0.5px solid var(--bd);margin-bottom:10px;overflow:hidden}
+.ch{padding:11px 14px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:13px;font-weight:600}
+.mets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.met{background:var(--bg);border-radius:var(--rl);border:0.5px solid var(--bd);padding:11px 13px}
+.ml{font-size:11px;color:var(--tx2);margin-bottom:3px}
+.mv{font-size:22px;font-weight:700}
+.ms{font-size:10.5px;color:var(--tx3);margin-top:2px}
+.li{padding:12px 14px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:11px;cursor:pointer}
+.li:last-child{border-bottom:none}
+.li:active{background:var(--bg2)}
+.lic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.lib{flex:1;min-width:0}
+.lit{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lis{font-size:11px;color:var(--tx2);margin-top:2px}
+.lir{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.b{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.bg{background:var(--gbg);color:var(--gtx)}
+.ba{background:var(--abg);color:var(--atx)}
+.br{background:var(--rbg);color:var(--rtx)}
+.bb{background:var(--bbg);color:var(--btx)}
+.bp{background:var(--pbg);color:var(--ptx)}
+.bx{background:var(--xbg);color:var(--xtx)}
+.mat{display:inline-flex;font-size:10.5px;padding:2px 7px;border-radius:99px;font-weight:500}
+.ma{background:var(--bbg);color:var(--btx)}
+.ms2{background:var(--abg);color:var(--atx)}
+.mr{background:var(--gbg);color:var(--gtx)}
+.me{background:var(--pbg);color:var(--ptx)}
+.msed{background:#FAECE7;color:#712B13}
+.mbi{background:#EAF3DE;color:#27500A}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r);padding:10px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.btp{background:var(--g);color:#fff}.btp:active{background:var(--g2)}
+.bto{background:transparent;color:var(--tx);border:0.5px solid var(--bd2)}.bto:active{background:var(--bg2)}
+.btd{background:var(--rbg);color:var(--rtx);border:0.5px solid #F7C1C1}
+.btf{width:100%;justify-content:center}
+.bts{padding:6px 11px;font-size:12.5px}
+.fab{position:fixed;bottom:calc(72px + var(--sb));right:14px;width:50px;height:50px;background:var(--g);color:#fff;border-radius:50%;border:none;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(15,110,86,.35);cursor:pointer;z-index:50}
+.fab:active{background:var(--g2);transform:scale(0.95)}
+.fg{margin-bottom:13px}
+.fl{font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.04em}
+input[type=text],input[type=date],input[type=number],input[type=email],input[type=password],select,textarea{width:100%;border:0.5px solid var(--bd2);border-radius:var(--r);padding:10px 12px;font-family:inherit;font-size:15px;background:var(--bg);color:var(--tx);-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(15,110,86,.14)}
+textarea{resize:none;min-height:72px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.ci{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-bottom:0.5px solid var(--bd)}
+.ci:last-child{border-bottom:none}
+.ci input[type=checkbox]{width:20px;height:20px;accent-color:var(--g);flex-shrink:0;margin-top:1px}
+.sbg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none}
+.sbg.on{display:block}
+.sh{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-radius:20px 20px 0 0;z-index:201;padding:0 0 calc(20px + var(--sb));max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,0,.67,0)}
+.sbg.on .sh{transform:translateY(0)}
+.shdl{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:12px auto 14px}
+.sht{font-size:16px;font-weight:700;padding:0 16px 13px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.shclose{width:30px;height:30px;border-radius:50%;border:none;background:var(--bg3);color:var(--tx2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.shb{padding:16px}
+.dw{display:none;position:fixed;inset:0;background:var(--bg3);z-index:150;overflow-y:auto}
+.dw.on{display:block}
+.dtb{background:var(--bg);border-bottom:0.5px solid var(--bd);padding:11px 14px;padding-top:calc(11px + var(--st));display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:10}
+.dback{font-size:24px;color:var(--g);cursor:pointer;flex-shrink:0}
+.dtt{font-size:15px;font-weight:700}
+.dts{font-size:11.5px;color:var(--tx2);margin-top:1px}
+.dbody{padding:13px}
+.ir{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--bd);gap:10px}
+.ir:last-child{border-bottom:none}
+.ik{font-size:12px;color:var(--tx2);flex-shrink:0}
+.iv{font-size:13px;font-weight:500;text-align:right}
+.scw{position:fixed;inset:0;background:#000;z-index:500;display:flex;flex-direction:column}
+.scw.hid{display:none}
+.sctb{padding:13px 15px;padding-top:calc(13px + var(--st));display:flex;align-items:center;justify-content:space-between;color:#fff;flex-shrink:0}
+#scv{width:100%;flex:1;object-fit:cover}
+.sco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.scf{width:220px;height:220px;position:relative}
+.scf::before,.scf::after{content:'';position:absolute;width:36px;height:36px;border-color:#fff;border-style:solid}
+.scf::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.scf::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.sctr{position:absolute;top:0;right:0;width:36px;height:36px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 4px 0 0}
+.scbl{position:absolute;bottom:0;left:0;width:36px;height:36px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 4px}
+.scln{position:absolute;left:0;right:0;height:2px;background:rgba(15,220,100,.8);animation:scana 2s ease-in-out infinite}
+@keyframes scana{0%,100%{top:8%}50%{top:88%}}
+.sccc{display:none}
+.scrb{padding:13px 15px;padding-bottom:calc(13px + var(--sb));background:rgba(0,0,0,.85);color:#fff;flex-shrink:0;display:flex;align-items:center;gap:11px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--tx3);text-align:center;gap:9px}
+.empty i{font-size:42px;opacity:.4}
+.et{font-size:14px;font-weight:600;color:var(--tx2)}
+.es{font-size:12.5px;line-height:1.5}
+.toast{position:fixed;bottom:calc(78px + var(--sb));left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.splash{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;z-index:9999;transition:opacity .35s}
+.splash.hid{opacity:0;pointer-events:none;display:none}
+.pb{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:4px}
+.pbv{height:100%;border-radius:99px;background:var(--g)}
+.trow{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.sb2{display:flex;align-items:center;background:var(--bg);border:0.5px solid var(--bd);border-radius:var(--r);padding:9px 12px;gap:8px;margin-bottom:10px}
+.sb2 i{font-size:17px;color:var(--tx3)}
+.sb2 input{border:none;background:none;font-size:15px;color:var(--tx);flex:1;outline:none}
+.alert{padding:10px 12px;border-radius:var(--r);font-size:12.5px;display:flex;gap:8px;margin-bottom:10px}
+.ai{background:var(--gbg);color:var(--gtx);border:0.5px solid #9FE1CB}
+.alert i{font-size:16px;flex-shrink:0;margin-top:1px}
+.sb3{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--bd2);background:transparent;font-size:14px;font-weight:700;color:var(--tx2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-right:3px}
+.sb3.on{background:var(--g);color:#fff;border-color:var(--g)}
+.cr{margin-bottom:13px;padding-bottom:13px;border-bottom:0.5px solid var(--bd)}
+.ib2{background:var(--bg);border-radius:var(--r);padding:10px 12px;font-size:13px;margin-bottom:12px;font-weight:500}
+.ah{padding:11px 14px;border-bottom:0.5px solid var(--bd)}
+.ah:last-child{border-bottom:none}
+.chip{display:inline-flex;font-size:10.5px;padding:2px 7px;border-radius:6px;font-weight:500;background:var(--xbg);color:var(--xtx)}
+/* Login */
+.login-wrap{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:998}
+.login-wrap.hid{display:none}
+.login-box{background:var(--bg);border-radius:18px;padding:24px;width:100%;max-width:360px}
+.login-logo{text-align:center;margin-bottom:20px}
+.login-logo div:first-child{font-size:48px}
+.login-logo .ln{font-size:20px;font-weight:700;color:var(--g);margin-top:6px}
+.login-logo .ls{font-size:11px;color:var(--tx3)}
+/* Assinatura */
+.sig-canvas{border:1.5px dashed var(--bd2);border-radius:var(--r);width:100%;height:120px;background:var(--bg);touch-action:none;cursor:crosshair;display:block}
+.sig-canvas.signed{border-color:var(--g);border-style:solid}
+/* Avatar */
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="splash" id="spl">
+  <div style="font-size:56px">🌿</div>
+  <div style="font-size:20px;font-weight:700;color:#fff">Éllu Ambiental</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.7)">ISO/IEC 17025:2017</div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">
+      <div>🌿</div>
+      <div class="ln">Éllu Ambiental</div>
+      <div class="ls">ISO/IEC 17025:2017</div>
+    </div>
+    <div class="fg"><label class="fl">Usuário</label><select id="loginUser"><option value="">— Selecione —</option></select></div>
+    <div class="fg"><label class="fl">Senha</label><input type="password" id="loginSenha" placeholder="••••••" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
+    <button class="btn btp btf" onclick="fazerLogin()"><i class="ti ti-login"></i>Entrar</button>
+    <div id="loginErr" style="color:var(--rtx);font-size:12px;text-align:center;margin-top:10px;display:none">Usuário ou senha incorretos</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="tb" id="topbar" style="display:none">
+  <div class="tb-l">
+    <div class="tb-logo">🌿</div>
+    <div><div class="tb-name">Éllu Ambiental</div><div class="tb-sub" id="tbSub">ISO 17025</div></div>
+  </div>
+  <div class="tb-r">
+    <button class="ib" onclick="instrucoesPorPlataforma()" title="Instalar app"><i class="ti ti-download"></i></button>
+    <button class="ib" onclick="abrirScanner()"><i class="ti ti-scan"></i></button>
+    <button class="ib" onclick="abrirSheet('shAlerta')"><i class="ti ti-bell"></i></button>
+    <button class="ib" id="btnLogout" onclick="fazerLogout()" title="Sair"><i class="ti ti-logout"></i></button>
+    <span id="syncIndicator" style="display:none;font-size:10px;opacity:.8;white-space:nowrap"><i class="ti ti-refresh" style="font-size:13px"></i></span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main" style="display:none">
+
+<!-- PAINEL -->
+<div class="pg on" id="pg-dash">
+  <div style="padding-top:12px"></div>
+  <div class="mets">
+    <div class="met"><div class="ml">Pedidos de compra abertos</div><div class="mv" id="mReq">0</div><div class="ms" id="msReq">nenhum</div></div>
+    <div class="met"><div class="ml">Insumos cadastrados</div><div class="mv" id="mIns">0</div><div class="ms" id="msIns">catálogo vazio</div></div>
+    <div class="met"><div class="ml">Fornecedores aprovados</div><div class="mv" id="mFornAp">0</div><div class="ms" id="msFornAp">de 0 cadastrados</div></div>
+    <div class="met"><div class="ml">Em qualificação</div><div class="mv" id="mFornQual">0</div><div class="ms" id="msFornQual">fornecedores</div></div>
+    <div class="met" id="metVenc"><div class="ml">Vencendo em 30 dias</div><div class="mv" id="mVenc">0</div><div class="ms" id="msVenc">insumos</div></div>
+  </div>
+  <div class="alert ai"><i class="ti ti-info-circle"></i><div>Cadastre insumos, qualifique fornecedores e crie pedidos conforme ISO 17025 §6.6.</div></div>
+  <div class="card"><div class="ch"><span class="ct">Últimos pedidos de compra</span></div><div id="dashReqs"><div class="empty"><i class="ti ti-file-text"></i><div class="et">Nenhum pedido</div><div class="es">Crie na aba Compras</div></div></div></div>
+</div>
+
+<!-- COMPRAS -->
+<div class="pg" id="pg-req">
+  <div style="padding-top:12px"></div>
+  <div class="sb2"><i class="ti ti-search"></i><input type="text" placeholder="Buscar insumo ou ID..." oninput="buscarReq(this.value)"></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:3px">
+    <button class="btn bto bts" id="fb-todas" onclick="filtroReq('todas',this)" style="border-color:var(--g);color:var(--g);white-space:nowrap">Todas</button>
+    <button class="btn bto bts" onclick="filtroReq('alta',this)" style="white-space:nowrap">Alta critici.</button>
+    <button class="btn bto bts" onclick="filtroReq('aprovacao',this)" style="white-space:nowrap">Aprovação</button>
+    <button class="btn bto bts" onclick="filtroReq('compra',this)" style="white-space:nowrap">Em compra</button>
+  </div>
+  <div class="card" id="liReq"><div class="empty" id="eReq"><i class="ti ti-file-plus"></i><div class="et">Nenhum pedido de compra</div><div class="es">Toque + para criar</div></div></div>
+  <button class="fab" onclick="abrirSheet('shReq')"><i class="ti ti-plus"></i></button>
+</div>
+
+<!-- INSUMOS -->
+<div class="pg" id="pg-ins">
+  <div style="padding-top:12px"></div>
+  <div class="sb2"><i class="ti ti-search"></i><input type="text" id="busInsInput" placeholder="Buscar insumo, matriz..." oninput="buscarIns(this.value)"></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:3px">
+    <button class="btn bto bts" onclick="filtroIns('',this)" style="border-color:var(--g);color:var(--g);white-space:nowrap">Todos</button>
+    <button class="btn bto bts" onclick="filtroIns('Água',this)" style="white-space:nowrap">Água</button>
+    <button class="btn bto bts" onclick="filtroIns('Solo',this)" style="white-space:nowrap">Solo</button>
+    <button class="btn bto bts" onclick="filtroIns('Ar',this)" style="white-space:nowrap">Ar</button>
+    <button class="btn bto bts" onclick="filtroIns('Efluente',this)" style="white-space:nowrap">Efluente</button>
+    <button class="btn bto bts" onclick="filtroIns('Sedimento',this)" style="white-space:nowrap">Sedimento</button>
+  </div>
+  <div class="card" id="liIns"><div class="empty" id="eIns"><i class="ti ti-flask"></i><div class="et">Catálogo vazio</div><div class="es">Toque + para cadastrar</div></div></div>
+  <button class="fab" onclick="abrirSheet('shIns')"><i class="ti ti-plus"></i></button>
+</div>
+
+<!-- FORNECEDORES -->
+<div class="pg" id="pg-forn">
+  <div style="padding-top:12px"></div>
+  <div class="alert ai"><i class="ti ti-info-circle"></i><div>Apenas fornecedores <strong>Aprovados</strong> podem ser usados em pedidos — ISO 17025 §6.6.2.</div></div>
+  <div class="card" id="liForn"><div class="empty" id="eForn"><i class="ti ti-building-store"></i><div class="et">Nenhum fornecedor</div><div class="es">Toque + para cadastrar</div></div></div>
+  <button class="fab" onclick="abrirSheet('shForn')"><i class="ti ti-plus"></i></button>
+</div>
+
+<!-- NC -->
+<div class="pg" id="pg-nc">
+  <div style="padding-top:12px"></div>
+  <div class="card" id="liNc"><div class="empty" id="eNc"><i class="ti ti-circle-check"></i><div class="et">Nenhuma NC registrada</div><div class="es">Toque + para registrar</div></div></div>
+  <button class="fab" onclick="abrirSheet('shNc')"><i class="ti ti-plus"></i></button>
+</div>
+
+<!-- USUÁRIOS -->
+<div class="pg" id="pg-usr">
+  <div style="padding-top:12px"></div>
+  <div class="card" id="liUsr"><div class="empty" id="eUsr"><i class="ti ti-users"></i><div class="et">Nenhum usuário</div><div class="es">Toque + para cadastrar</div></div></div>
+  <button class="fab" onclick="novoUsr()"><i class="ti ti-plus"></i></button>
+</div>
+
+<!-- INDICADORES -->
+<div class="pg" id="pg-ind">
+  <div style="padding-top:12px"></div>
+  <div id="indConteudo"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" id="bnav" style="display:none">
+  <button class="ni on" id="ni-dash" onclick="irPara('dash',this)"><i class="ti ti-layout-dashboard"></i><span>Painel</span></button>
+  <button class="ni" id="ni-req" onclick="irPara('req',this)"><i class="ti ti-file-text"></i><span>Compras</span></button>
+  <button class="ni" id="ni-ins" onclick="irPara('ins',this)"><i class="ti ti-flask"></i><span>Insumos</span></button>
+  <button class="ni" id="ni-forn" onclick="irPara('forn',this)"><i class="ti ti-building-store"></i><span>Fornec.</span></button>
+  <button class="ni" id="ni-nc" onclick="irPara('nc',this)"><i class="ti ti-alert-triangle"></i><span>NC</span></button>
+  <button class="ni" id="ni-rec" onclick="abrirSheet('shVerif')"><i class="ti ti-package"></i><span>Recepção</span></button>
+  <button class="ni" id="ni-ind" onclick="irPara('ind',this)"><i class="ti ti-chart-bar"></i><span>Indicad.</span></button>
+  <button class="ni" id="ni-usr" onclick="irPara('usr',this)" style="display:none"><i class="ti ti-users"></i><span>Usuários</span></button>
+</nav>
+
+<!-- DETAIL: Insumo -->
+<div class="dw" id="dIns">
+  <div class="dtb"><span class="dback" onclick="fecharDetalhe('dIns')"><i class="ti ti-arrow-left"></i></span><div><div class="dtt" id="dInsT">—</div><div class="dts" id="dInsS">—</div></div></div>
+  <div class="dbody" id="dInsB"></div>
+</div>
+
+<!-- DETAIL: Fornecedor -->
+<div class="dw" id="dForn">
+  <div class="dtb"><span class="dback" onclick="fecharDetalhe('dForn')"><i class="ti ti-arrow-left"></i></span><div><div class="dtt" id="dFornT">—</div><div class="dts" id="dFornS">—</div></div></div>
+  <div class="dbody" id="dFornB"></div>
+</div>
+
+<!-- DETAIL: Pedido de Compra -->
+<div class="dw" id="dReq">
+  <div class="dtb"><span class="dback" onclick="fecharDetalhe('dReq')"><i class="ti ti-arrow-left"></i></span><div><div class="dtt" id="dReqT">—</div><div class="dts" id="dReqS">—</div></div></div>
+  <div class="dbody" id="dReqB"></div>
+</div>
+
+<!-- SCANNER -->
+<div class="scw hid" id="scw">
+  <div class="sctb">
+    <div><div style="font-size:15px;font-weight:600">Escanear insumo</div><div style="font-size:11px;opacity:.7">Código de barras ou QR Code</div></div>
+    <button class="ib" onclick="fecharScanner()"><i class="ti ti-x"></i></button>
+  </div>
+  <div style="position:relative;flex:1;overflow:hidden">
+    <video id="scv" playsinline autoplay muted style="width:100%;height:100%;object-fit:cover"></video>
+    <canvas class="sccc" id="scc"></canvas>
+    <div class="sco"><div class="scf"><div class="sctr"></div><div class="scbl"></div><div class="scln"></div></div></div>
+  </div>
+  <div style="color:rgba(255,255,255,.8);font-size:13px;text-align:center;padding:13px;flex-shrink:0">Aponte para o código de barras</div>
+  <div class="scrb" id="scRes" style="display:none">
+    <i class="ti ti-check" style="font-size:19px;color:#4ade80;flex-shrink:0"></i>
+    <div style="flex:1"><div style="font-size:11px;opacity:.7">Detectado</div><div id="scTxt" style="font-size:15px;font-weight:600">—</div></div>
+    <button class="btn bts" style="background:rgba(255,255,255,.2);color:#fff;border:none" onclick="usarScan()">Usar</button>
+  </div>
+</div>
+
+<!-- SHEET: Novo Pedido de Compra -->
+<div class="sbg" id="bgReq" onclick="fecharSheet('shReq')">
+<div class="sh" id="shReq" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Novo pedido de compra<button class="shclose" onclick="fecharSheet('shReq')">✕</button></div>
+  <div class="shb">
+    <div class="fg"><label class="fl">Selecionar do catálogo</label><select id="rCat" onchange="preencherReqDoCatalogo(this.value)"><option value="">— ou escolha um insumo cadastrado —</option></select></div>
+    <div class="fg"><label class="fl">Insumo / descrição técnica</label><input type="text" id="rIns" placeholder="Nome do insumo"></div>
+    <div class="fg"><label class="fl">Tipo</label><select id="rTipo">
+      <option>Insumos (consumíveis)</option>
+      <option>Materiais de Referência (MR e MRC)</option>
+      <option>Gases</option>
+      <option>Equipamentos</option>
+    </select></div>
+    <div class="fg"><label class="fl">Matriz ambiental</label><select id="rMat"><option value="">— Selecione —</option><option>Água superficial</option><option>Água subterrânea</option><option>Solo</option><option>Sedimento</option><option>Ar / emissões atmosféricas</option><option>Efluente líquido</option></select></div>
+    <div class="fg"><label class="fl">Criticidade</label><select id="rCrit"><option>Alta — afeta o resultado do ensaio</option><option>Média — suporte analítico</option><option>Baixa — uso geral</option></select></div>
+    <div class="fg"><label class="fl">Especificação técnica</label><input type="text" id="rSpec" placeholder="Ex.: pureza ≥99,9%, rastreabilidade NIST"></div>
+    <div class="fg"><label class="fl">Quantidade</label><input type="text" id="rQtd" placeholder="Ex.: 6 frascos 100mL"></div>
+    <div class="fg"><label class="fl">Fornecedor</label>
+      <select id="rForn" onchange="sincFornReq(this.value)">
+        <option value="">— Selecione do cadastro —</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">E-mail do fornecedor</label><input type="text" id="rFornEmail" placeholder="contato@fornecedor.com.br" style="background:var(--bg2)" readonly></div>
+    <div class="fg"><label class="fl">Solicitante</label><select id="rSolic"><option value="">— Selecione —</option></select></div>
+    <div class="fg"><label class="fl">Data necessária</label><input type="date" id="rData"></div>
+    <div class="fg"><label class="fl">Justificativa técnica §6.6.1</label><textarea id="rJust" placeholder="Impacto na qualidade dos resultados..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarReq()"><i class="ti ti-send"></i>Enviar para aprovação</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Novo Insumo -->
+<div class="sbg" id="bgIns" onclick="fecharSheet('shIns')">
+<div class="sh" id="shIns" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Cadastrar insumo crítico<button class="shclose" onclick="fecharSheet('shIns')">✕</button></div>
+  <div class="shb">
+    <div class="fg"><label class="fl">Nome do insumo</label><input type="text" id="iNome" placeholder="Ex.: Padrão Pb 1000mg/L NIST-traceable"></div>
+    <div class="fg"><label class="fl">Tipo</label><select id="iTipo">
+      <option>Insumos (consumíveis)</option>
+      <option>Materiais de Referência (MR e MRC)</option>
+      <option>Gases</option>
+      <option>Equipamentos</option>
+    </select></div>
+    <div class="fg"><label class="fl">Matriz ambiental</label><select id="iMat"><option value="">— Selecione —</option><option>Água superficial</option><option>Água subterrânea</option><option>Solo</option><option>Sedimento</option><option>Ar / emissões atmosféricas</option><option>Efluente líquido</option></select></div>
+    <div class="fg"><label class="fl">Criticidade</label><select id="iCrit"><option>Alta — afeta diretamente o resultado</option><option>Média — suporte analítico</option><option>Baixa — uso geral</option></select></div>
+    <div class="fg"><label class="fl">Especificação técnica mínima</label><input type="text" id="iSpec" placeholder="Ex.: pureza ≥99,9%, rastreabilidade NIST"></div>
+    <div class="fg"><label class="fl">Fornecedor preferencial</label><select id="iFornSel" onchange="sincFornIns(this.value)"><option value="">— Selecione do cadastro —</option></select></div>
+    <div class="fg"><label class="fl">E-mail do fornecedor</label><input type="text" id="iFornEmail" placeholder="contato@fornecedor.com.br" style="background:var(--bg2)" readonly></div>
+    <div class="fg"><label class="fl">Código de barras / referência</label>
+      <div style="display:flex;gap:8px"><input type="text" id="iCod" placeholder="EAN ou código do produto" style="flex:1"><button class="btn bto bts" onclick="abrirScanner('iCod')"><i class="ti ti-scan"></i></button></div>
+    </div>
+    <div class="fg"><label class="fl">Validade mínima exigida (meses)</label><input type="number" id="iVal" placeholder="Ex.: 12" min="1"></div>
+    <div class="fg"><label class="fl">Data de validade do lote atual</label><input type="date" id="iValMin"></div>
+    <div class="fg"><label class="fl">Observações / requisitos especiais</label><textarea id="iObs" placeholder="Armazenamento, transporte, certificados exigidos..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarIns()"><i class="ti ti-check"></i>Cadastrar insumo</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Novo Fornecedor -->
+<div class="sbg" id="bgForn" onclick="fecharSheet('shForn')">
+<div class="sh" id="shForn" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Novo fornecedor<button class="shclose" onclick="fecharSheet('shForn')">✕</button></div>
+  <div class="shb">
+    <div class="fg"><label class="fl">Razão social</label><input type="text" id="fNome" placeholder="Razão social completa"></div>
+    <div class="fg"><label class="fl">CNPJ</label><input type="text" id="fCnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="fg"><label class="fl">Especialidade</label><input type="text" id="fEspec" placeholder="Ex.: Padrões de referência, solventes HPLC"></div>
+    <div class="fg"><label class="fl">Matrizes atendidas</label><select id="fMat"><option>Água</option><option>Solo / Sedimento</option><option>Ar / Emissões</option><option>Efluente</option><option>Múltiplas matrizes</option></select></div>
+    <div class="fg"><label class="fl">Status inicial</label><select id="fStat"><option>Em qualificação</option><option>Aprovado</option></select></div>
+    <div class="fg"><label class="fl">Contato / e-mail</label><input type="text" id="fCont" placeholder="contato@fornecedor.com.br"></div>
+    <div class="fg"><label class="fl">Periodicidade de reavaliação</label><select id="fPer"><option>Anual</option><option>Semestral</option><option>A cada 2 anos</option></select></div>
+    <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarForn()"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Avaliação Fornecedor -->
+<div class="sbg" id="bgAval" onclick="fecharSheet('shAval')">
+<div class="sh" id="shAval" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Avaliar fornecedor — §6.6.2<button class="shclose" onclick="fecharSheet('shAval')">✕</button></div>
+  <div class="shb">
+    <div class="ib2" id="avalInfo">—</div>
+    <input type="hidden" id="avalIdx">
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:13px">Critérios — nota de 1 a 5</div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>1. Qualidade e pureza dos insumos</span><span style="font-weight:700;color:var(--g)" id="sv0">—</span></div><div id="sb0"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>2. Conformidade documental (CoA)</span><span style="font-weight:700;color:var(--g)" id="sv1">—</span></div><div id="sb1"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>3. Cumprimento de prazos</span><span style="font-weight:700;color:var(--g)" id="sv2">—</span></div><div id="sb2"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>4. Tratamento de não conformidades</span><span style="font-weight:700;color:var(--g)" id="sv3">—</span></div><div id="sb3"></div></div>
+    <div class="cr" style="border-bottom:none"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>5. Capacidade técnica ambiental</span><span style="font-weight:700;color:var(--g)" id="sv4">—</span></div><div id="sb4"></div></div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Nota geral calculada</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
+    <div class="fg"><label class="fl">Decisão</label><select id="avalDec"><option>Aprovado</option><option>Aprovado com condições</option><option>Suspenso temporariamente</option><option>Descredenciado</option></select></div>
+    <div class="fg"><label class="fl">Observações e evidências</label><textarea id="avalObs" placeholder="Evidências, NC relacionadas, melhorias..."></textarea></div>
+    <div class="fg"><label class="fl">Próxima reavaliação</label><input type="date" id="avalProx"></div>
+    <button class="btn btp btf" onclick="salvarAval()"><i class="ti ti-star"></i>Salvar avaliação</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Nova Campanha -->
+<!-- SHEET: Nova NC -->
+<div class="sbg" id="bgNc" onclick="fecharSheet('shNc')">
+<div class="sh" id="shNc" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Registrar não conformidade<button class="shclose" onclick="fecharSheet('shNc')">✕</button></div>
+  <div class="shb">
+    <div class="fg"><label class="fl">Descrição</label><textarea id="ncDesc" placeholder="Descreva objetivamente o desvio..."></textarea></div>
+    <div class="fg"><label class="fl">Origem</label><select id="ncOri"><option>Recepção de insumo</option><option>Verificação de qualidade</option><option>Uso em ensaio</option><option>Auditoria interna</option></select></div>
+    <div class="fg"><label class="fl">Pedido / registro vinculado</label><input type="text" id="ncPed" placeholder="Ex.: PC-001"></div>
+    <div class="fg"><label class="fl">Gravidade</label><select id="ncGrav"><option>Crítica — risco imediato à validade dos resultados</option><option>Maior — impacto significativo</option><option>Menor — impacto limitado</option></select></div>
+    <div class="fg"><label class="fl">Responsável</label><input type="text" id="ncResp" placeholder="Nome do responsável"></div>
+    <div class="fg"><label class="fl">Prazo para tratamento</label><input type="date" id="ncPrazo"></div>
+    <div class="fg"><label class="fl">Contenção imediata</label><textarea id="ncCont" placeholder="Ação imediata tomada..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarNc()"><i class="ti ti-alert-triangle"></i>Registrar NC</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Recepção -->
+<div class="sbg" id="bgVerif" onclick="fecharSheet('shVerif')">
+<div class="sh" id="shVerif" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Verificação de recepção §6.6.3<button class="shclose" onclick="fecharSheet('shVerif')">✕</button></div>
+  <div class="shb">
+    <div class="fg"><label class="fl">Pedido de compra</label><select id="vPc" onchange="preencherRecepcaoDoPC(this.value)"><option value="">— Selecione o pedido —</option></select></div>
+    <div class="fg"><label class="fl">Insumo recebido</label><input type="text" id="vIns" placeholder="Descrição do insumo"></div>
+    <div class="fg"><label class="fl">Número do lote</label>
+      <div style="display:flex;gap:8px"><input type="text" id="vLote" placeholder="Lote" style="flex:1"><button class="btn bto bts" onclick="abrirScanner('vLote')"><i class="ti ti-scan"></i>Scan</button></div>
+    </div>
+    <div class="fg"><label class="fl">Data de validade</label><input type="date" id="vVal"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:9px;text-transform:uppercase;letter-spacing:.05em">Checklist §6.6.3</div>
+    <div class="card" style="margin-bottom:13px">
+      <div class="ci"><input type="checkbox" id="ck1"><span style="font-size:13px">CoA presente e legível</span></div>
+      <div class="ci"><input type="checkbox" id="ck2"><span style="font-size:13px">Rastreabilidade NIST/INMETRO documentada</span></div>
+      <div class="ci"><input type="checkbox" id="ck3"><span style="font-size:13px">Especificação confere com o pedido</span></div>
+      <div class="ci"><input type="checkbox" id="ck4"><span style="font-size:13px">Validade dentro do prazo mínimo</span></div>
+      <div class="ci"><input type="checkbox" id="ck5"><span style="font-size:13px">Embalagem íntegra, lacre intacto</span></div>
+      <div class="ci"><input type="checkbox" id="ck6"><span style="font-size:13px">Quantidade confere com o pedido</span></div>
+      <div class="ci"><input type="checkbox" id="ck7"><span style="font-size:13px">Lote registrado no sistema</span></div>
+    </div>
+    <div class="fg"><label class="fl">Resultado</label><select id="vRes"><option>Aprovado — liberar para uso</option><option>Condicional — liberar com restrições</option><option>Reprovado — devolver / abrir NC</option></select></div>
+    <div class="fg"><label class="fl">Responsável</label><select id="vResp"><option value="">— Selecione —</option></select></div>
+    <div class="fg"><label class="fl">Observações</label><textarea id="vObs" placeholder="Desvios observados..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarVerif()"><i class="ti ti-clipboard-check"></i>Registrar verificação</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Alertas -->
+<div class="sbg" id="bgAlerta" onclick="fecharSheet('shAlerta')">
+<div class="sh" id="shAlerta" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Alertas<button class="shclose" onclick="fecharSheet('shAlerta')">✕</button></div>
+  <div id="liAlerta"><div class="empty" style="padding:30px 20px"><i class="ti ti-bell"></i><div class="et">Nenhum alerta</div></div></div>
+</div></div>
+
+<!-- SHEET: Aprovação -->
+<div class="sbg" id="bgAprov" onclick="fecharSheet('shAprov')">
+<div class="sh" id="shAprov" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Aprovar / Rejeitar pedido<button class="shclose" onclick="fecharSheet('shAprov')">✕</button></div>
+  <div class="shb">
+    <input type="hidden" id="aprovIdx">
+    <div class="ib2" id="aprovInfo">—</div>
+    <div class="fg"><label class="fl">Decisão</label>
+      <select id="aprovDec">
+        <option value="compra">✅ Aprovado — encaminhar para compra</option>
+        <option value="aprovacao">🔄 Devolver para revisão</option>
+        <option value="rejeitado">❌ Rejeitado</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Aprovador</label><select id="aprovResp" onchange="carregarSigAprovador(this.value)"><option value="">— Selecione —</option></select></div>
+    <div class="fg">
+      <label class="fl">Assinatura digital</label>
+      <div id="sigAprovPreview" style="display:none;margin-bottom:8px;padding:8px;background:var(--bg2);border-radius:var(--r);text-align:center">
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">Assinatura do cadastro</div>
+        <img id="sigAprovImg" style="max-height:50px;background:#fff;border-radius:6px;padding:4px">
+      </div>
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:6px">Ou desenhe uma assinatura abaixo (sobrescreve o cadastro)</div>
+      <canvas class="sig-canvas" id="sigAprov"></canvas>
+      <button class="btn bto bts" style="margin-top:6px" onclick="limparAssinatura('sigAprov')"><i class="ti ti-eraser"></i>Limpar desenho</button>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><textarea id="aprovObs" placeholder="Justificativa da decisão..."></textarea></div>
+    <button class="btn btp btf" onclick="salvarAprov()"><i class="ti ti-check"></i>Confirmar decisão</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Novo Usuário -->
+<div class="sbg" id="bgUsr" onclick="fecharSheet('shUsr')">
+<div class="sh" id="shUsr" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht" id="shUsrTitulo">Novo usuário<button class="shclose" onclick="fecharSheet('shUsr')">✕</button></div>
+  <div class="shb">
+    <input type="hidden" id="uIdx" value="-1">
+    <div class="fg"><label class="fl">Nome completo</label><input type="text" id="uNome" placeholder="Nome do usuário"></div>
+    <div class="fg"><label class="fl">E-mail</label><input type="email" id="uEmail" placeholder="usuario@lab.com.br"></div>
+    <div class="fg"><label class="fl">Senha <span id="uSenhaLabel" style="font-weight:400;text-transform:none">(mín. 4 caracteres)</span></label><input type="password" id="uSenha" placeholder="••••••"></div>
+    <div class="fg"><label class="fl">Perfil / Permissões</label>
+      <div class="card" style="padding:4px 0;margin-top:2px">
+        <div class="ci"><input type="checkbox" id="uPAdmin" value="admin"><span style="font-size:13px">Administrador (acesso total)</span></div>
+        <div class="ci"><input type="checkbox" id="uPAprov" value="aprovador"><span style="font-size:13px">Aprovador (aprova pedidos)</span></div>
+        <div class="ci"><input type="checkbox" id="uPSolic" value="solicitante"><span style="font-size:13px">Solicitante (cria pedidos)</span></div>
+        <div class="ci"><input type="checkbox" id="uPRec"  value="recepcao"><span style="font-size:13px">Recepção (recebe itens)</span></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Assinatura digital</label>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:7px">Desenhe sua assinatura abaixo</div>
+      <canvas class="sig-canvas" id="sigUsr"></canvas>
+      <button class="btn bto bts" style="margin-top:6px" onclick="limparAssinatura('sigUsr')"><i class="ti ti-eraser"></i>Limpar</button>
+    </div>
+    <button class="btn btp btf" onclick="salvarUsr()" id="btnSalvarUsr"><i class="ti ti-check"></i>Cadastrar usuário</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Avaliação do Pedido -->
+<div class="sbg" id="bgAvalPC" onclick="fecharSheet('shAvalPC')">
+<div class="sh" id="shAvalPC" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Avaliar pedido de compra<button class="shclose" onclick="fecharSheet('shAvalPC')">✕</button></div>
+  <div class="shb">
+    <input type="hidden" id="avalPCIdx">
+    <div class="ib2" id="avalPCInfo">—</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Critérios de avaliação</div>
+    <div class="card" style="margin-bottom:13px">
+      <div class="ci"><input type="checkbox" id="apc1"><span style="font-size:13px">Entrega no prazo acordado</span></div>
+      <div class="ci"><input type="checkbox" id="apc2"><span style="font-size:13px">Qualidade conforme especificação</span></div>
+      <div class="ci"><input type="checkbox" id="apc3"><span style="font-size:13px">Documentação completa (CoA, NF)</span></div>
+      <div class="ci"><input type="checkbox" id="apc4"><span style="font-size:13px">Quantidade correta recebida</span></div>
+      <div class="ci"><input type="checkbox" id="apc5"><span style="font-size:13px">Embalagem íntegra</span></div>
+      <div class="ci"><input type="checkbox" id="apc6"><span style="font-size:13px">Rastreabilidade documentada</span></div>
+    </div>
+    <div class="fg"><label class="fl">Resultado geral</label>
+      <select id="avalPCRes">
+        <option value="Conforme">✅ Conforme — aprovado para uso</option>
+        <option value="Conforme com ressalvas">⚠️ Conforme com ressalvas</option>
+        <option value="Não conforme">❌ Não conforme — abrir NC</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><textarea id="avalPCObs" placeholder="Desvios, observações..."></textarea></div>
+    <div class="fg"><label class="fl">Avaliador</label><select id="avalPCResp"><option value="">— Selecione —</option></select></div>
+    <button class="btn btp btf" onclick="salvarAvalPC()"><i class="ti ti-check"></i>Registrar avaliação</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Avaliação do Fornecedor por Pedido -->
+<div class="sbg" id="bgAvalFornPC" onclick="fecharSheet('shAvalFornPC')">
+<div class="sh" id="shAvalFornPC" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht">Avaliar fornecedor do pedido<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
+  <div class="shb">
+    <input type="hidden" id="avalFornPCIdx">
+    <div class="ib2" id="avalFornPCInfo">—</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Critérios de avaliação do fornecedor</div>
+    <div class="card" style="margin-bottom:13px">
+      <div class="ci"><input type="checkbox" id="afpc1"><span style="font-size:13px">Entregou no prazo combinado</span></div>
+      <div class="ci"><input type="checkbox" id="afpc2"><span style="font-size:13px">Qualidade conforme especificação</span></div>
+      <div class="ci"><input type="checkbox" id="afpc3"><span style="font-size:13px">Documentação completa (CoA, NF, laudos)</span></div>
+      <div class="ci"><input type="checkbox" id="afpc4"><span style="font-size:13px">Quantidade e embalagem corretas</span></div>
+      <div class="ci"><input type="checkbox" id="afpc5"><span style="font-size:13px">Rastreabilidade / certificados presentes</span></div>
+      <div class="ci"><input type="checkbox" id="afpc6"><span style="font-size:13px">Atendimento e comunicação adequados</span></div>
+    </div>
+    <div class="fg"><label class="fl">Nota geral (1–5)</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="avalFornPCStars">
+        <button class="sb3" onclick="setNotaFornPC(1)">1</button>
+        <button class="sb3" onclick="setNotaFornPC(2)">2</button>
+        <button class="sb3" onclick="setNotaFornPC(3)">3</button>
+        <button class="sb3" onclick="setNotaFornPC(4)">4</button>
+        <button class="sb3" onclick="setNotaFornPC(5)">5</button>
+        <span id="avalFornPCNotaTxt" style="font-size:13px;color:var(--tx2);align-self:center">—</span>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Resultado</label>
+      <select id="avalFornPCRes">
+        <option value="Aprovado">✅ Aprovado — manter</option>
+        <option value="Aprovado com condições">⚠️ Aprovado com condições</option>
+        <option value="Suspenso temporariamente">🔴 Suspenso temporariamente</option>
+        <option value="Descredenciado">❌ Descredenciado</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><textarea id="avalFornPCObs" placeholder="Desvios, pontos de melhoria..."></textarea></div>
+    <div class="fg"><label class="fl">Avaliador</label><select id="avalFornPCResp"><option value="">— Selecione —</option></select></div>
+    <button class="btn btp btf" onclick="salvarAvalFornPC()"><i class="ti ti-check"></i>Registrar avaliação</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Instalar -->
+<div class="sbg" id="bgInstall" onclick="fecharSheet('shInstall')">
+<div class="sh" id="shInstall" onclick="event.stopPropagation()">
+  <div class="shdl"></div>
+  <div class="sht">Instalar Éllu Ambiental<button class="shclose" onclick="fecharSheet('shInstall')">✕</button></div>
+  <div class="shb" id="installInstructions"></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// STORAGE
+// ============================================================
+// ============================================================
+// STORAGE — localStorage (cache) + Firebase Firestore (nuvem)
+// ============================================================
+var DB = {
+  get: function(k){
+    try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; }
+  },
+  set: function(k,v){
+    localStorage.setItem(k,JSON.stringify(v));
+    var colecoes=['requisicoes','insumos','fornecedores','ncs','verificacoes','usuarios'];
+    if(colecoes.indexOf(k)>=0){
+      var ind=document.getElementById('syncIndicator');
+      if(ind) ind.style.display='';
+      try{
+        db.collection('ellu').doc(k).set({dados: JSON.stringify(v), atualizado: new Date().toISOString()})
+          .then(function(){ if(ind) ind.style.display='none'; })
+          .catch(function(e){ console.warn('Firestore set error:', e); if(ind) ind.style.display='none'; });
+      }catch(e){ if(ind) ind.style.display='none'; }
+    }
+  },
+  push: function(k,v){
+    var a=DB.get(k)||[]; a.push(v); DB.set(k,a); return a;
+  }
+};
+
+// Sincronizar dados do Firestore para o localStorage
+function sincronizarDoFirestore(callback){
+  var chamado = false;
+  function chamarUmaVez(){
+    if(!chamado){ chamado=true; callback&&callback(); }
+  }
+
+  // Timeout de segurança: se o Firestore demorar >5s, inicia o app mesmo assim
+  var tmo = setTimeout(function(){
+    console.warn('Firestore timeout — iniciando com dados locais');
+    chamarUmaVez();
+  }, 5000);
+
+  var colecoes=['requisicoes','insumos','fornecedores','ncs','verificacoes','usuarios'];
+  var pendentes=colecoes.length;
+  colecoes.forEach(function(col){
+    db.collection('ellu').doc(col).get().then(function(doc){
+      if(doc.exists && doc.data() && doc.data().dados){
+        try{
+          var dados=JSON.parse(doc.data().dados);
+          localStorage.setItem(col,JSON.stringify(dados));
+        }catch(e){}
+      }
+      pendentes--;
+      if(pendentes===0){ clearTimeout(tmo); chamarUmaVez(); }
+    }).catch(function(e){
+      console.warn('Firestore get error:', col, e);
+      pendentes--;
+      if(pendentes===0){ clearTimeout(tmo); chamarUmaVez(); }
+    });
+  });
+}
+
+// Escutar mudanças em tempo real (quando outro dispositivo salva)
+function iniciarSincronizacaoRealtime(){
+  var colecoes=['requisicoes','insumos','fornecedores','ncs','verificacoes','usuarios'];
+  colecoes.forEach(function(col){
+    db.collection('ellu').doc(col).onSnapshot(function(doc){
+      if(doc.exists && doc.data() && doc.data().dados){
+        try{
+          var dados=JSON.parse(doc.data().dados);
+          var local=DB.get(col);
+          // Só atualizar se for diferente do que temos localmente
+          if(JSON.stringify(dados)!==JSON.stringify(local)){
+            localStorage.setItem(col,JSON.stringify(dados));
+            // Re-renderizar a tela atual se for uma coleção relevante
+            renderizarTelaAtual();
+          }
+        }catch(e){}
+      }
+    }, function(e){ console.warn('Firestore listener error:', col, e); });
+  });
+}
+
+function renderizarTelaAtual(){
+  var pg=document.querySelector('.pg.on');
+  if(!pg) return;
+  var id=pg.id.replace('pg-','');
+  if(id==='dash') renderDash();
+  else if(id==='req') renderReqs();
+  else if(id==='ins') renderIns();
+  else if(id==='forn') renderForn();
+  else if(id==='nc') renderNc();
+  else if(id==='usr') renderUsr();
+  else if(id==='ind') renderIndicadores();
+}
+
+function resetarDados(){
+  var keys=['requisicoes','insumos','fornecedores','campanhas','ncs','verificacoes','usuarios','reqC','ncC','installShown'];
+  keys.forEach(function(k){ localStorage.removeItem(k); });
+}
+
+var reqC = DB.get('reqC')||1;
+var ncC  = DB.get('ncC')||1;
+var usuarioAtual = null;
+
+// ============================================================
+// AUTENTICAÇÃO
+// ============================================================
+function carregarLoginSelect(){
+  var users = DB.get('usuarios')||[];
+  var sel = document.getElementById('loginUser');
+  sel.innerHTML = '<option value="">— Selecione —</option>';
+  users.forEach(function(u,i){
+    var o = document.createElement('option');
+    o.value = i; o.textContent = u.nome+' ('+perfilLabel(u.perfis||u.perfil)+')';
+    sel.appendChild(o);
+  });
+}
+
+function getPerfisCheckbox(){
+  var perfis=[];
+  ['uPAdmin','uPAprov','uPSolic','uPRec'].forEach(function(id){
+    var el=document.getElementById(id); if(el&&el.checked) perfis.push(el.value);
+  });
+  return perfis;
+}
+function setPerfisCheckbox(perfis){
+  var arr=Array.isArray(perfis)?perfis:(perfis?[perfis]:[]);
+  ['uPAdmin','uPAprov','uPSolic','uPRec'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.checked=arr.indexOf(el.value)>=0;
+  });
+}
+function temPerfil(u, perfil){
+  if(!u) return false;
+  var perfis=Array.isArray(u.perfis)?u.perfis:(u.perfil?[u.perfil]:[]);
+  return perfis.indexOf(perfil)>=0;
+}
+function perfilLabel(p){
+  var map={admin:'Admin',aprovador:'Aprovador',solicitante:'Solicitante',recepcao:'Recepção'};
+  if(Array.isArray(p)) return p.map(function(x){ return map[x]||x; }).join(', ');
+  return map[p]||p||'—';
+}
+function perfilBadge(perfis){
+  var arr=Array.isArray(perfis)?perfis:(perfis?[perfis]:[]);
+  var cores={admin:'bg',aprovador:'bb',solicitante:'ba',recepcao:'bx'};
+  var labels={admin:'Admin',aprovador:'Aprovador',solicitante:'Solicitante',recepcao:'Recepção'};
+  return arr.map(function(p){ return '<span class="b '+(cores[p]||'bx')+'">'+(labels[p]||p)+'</span>'; }).join(' ');
+}
+
+function aplicarPermissoes(){
+  if(!usuarioAtual) return;
+  var isAdmin = temPerfil(usuarioAtual,'admin');
+  var niUsr = document.getElementById('ni-usr');
+  var bnav = document.getElementById('bnav');
+  if(isAdmin){
+    niUsr.style.display = '';
+    bnav.classList.add('admin-mode');
+  } else {
+    niUsr.style.display = 'none';
+    bnav.classList.remove('admin-mode');
+  }
+}
+
+function fazerLogin(){
+  var users = DB.get('usuarios')||[];
+  var idx = parseInt(document.getElementById('loginUser').value);
+  var senha = document.getElementById('loginSenha').value;
+  if(isNaN(idx)||idx<0){ document.getElementById('loginErr').style.display='block'; return; }
+  var u = users[idx];
+  if(!u||u.senha!==senha){ document.getElementById('loginErr').style.display='block'; return; }
+  usuarioAtual = Object.assign({},u,{idx:idx});
+  document.getElementById('loginErr').style.display='none';
+  document.getElementById('loginSenha').value='';
+  document.getElementById('loginWrap').classList.add('hid');
+  document.getElementById('topbar').style.display='';
+  document.getElementById('main').style.display='';
+  document.getElementById('bnav').style.display='';
+  document.getElementById('tbSub').textContent = 'ISO 17025 · '+u.nome;
+  aplicarPermissoes();
+  renderDash(); atualizarCatalogSelect(); atualizarFornSelect(); popularUserSelects();
+}
+
+function fazerLogout(){
+  usuarioAtual = null;
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('main').style.display='none';
+  document.getElementById('bnav').style.display='none';
+  document.getElementById('loginWrap').classList.remove('hid');
+  document.getElementById('loginSenha').value='';
+  carregarLoginSelect();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function irPara(id, el) {
+  var pgs = document.querySelectorAll('.pg');
+  for(var i=0;i<pgs.length;i++) pgs[i].classList.remove('on');
+  var nis = document.querySelectorAll('.ni');
+  for(var i=0;i<nis.length;i++) nis[i].classList.remove('on');
+  var pg = document.getElementById('pg-'+id);
+  if(pg) pg.classList.add('on');
+  if(el) el.classList.add('on');
+  document.getElementById('main').scrollTo(0,0);
+  if(id==='dash') renderDash();
+  if(id==='req')  renderReqs();
+  if(id==='ins')  renderIns();
+  if(id==='forn') renderForn();
+  if(id==='nc')   renderNc();
+  if(id==='usr')  renderUsr();
+  if(id==='ind')  renderIndicadores();
+}
+
+// ============================================================
+// SHEETS & DETAIL
+// ============================================================
+function abrirSheet(id) {
+  var prefix = id.replace('sh','bg');
+  document.getElementById(prefix).classList.add('on');
+  history.pushState({type:'sheet',id:id},'');
+  if(id==='shAprov') setTimeout(function(){ iniciarCanvas('sigAprov'); }, 350);
+  if(id==='shUsr')   setTimeout(function(){ iniciarCanvas('sigUsr');   }, 350);
+  if(id==='shVerif') { popularPCSelect(); preencherResponsavelLogado(); }
+  if(id==='shReq')   { preencherSolicitanteLogado(); atualizarFornSelectReq(); }
+}
+function fecharSheet(id) {
+  var prefix = id.replace('sh','bg');
+  document.getElementById(prefix).classList.remove('on');
+}
+function abrirDetalhe(id) {
+  document.getElementById(id).classList.add('on');
+  document.getElementById(id).scrollTo(0,0);
+  history.pushState({type:'detalhe',id:id},'');
+}
+function fecharDetalhe(id) {
+  document.getElementById(id).classList.remove('on');
+}
+window.addEventListener('popstate', function(e) {
+  var sheets = document.querySelectorAll('.sbg.on');
+  if(sheets.length>0){ sheets.forEach(function(bg){ bg.classList.remove('on'); }); return; }
+  var detalhes = document.querySelectorAll('.dw.on');
+  if(detalhes.length>0){ detalhes.forEach(function(dw){ dw.classList.remove('on'); }); return; }
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(function(){ t.classList.remove('on'); }, 2800);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+var MCLASS = {'Água superficial':'ma','Água subterrânea':'ma','Solo':'ms2','Sedimento':'msed','Ar / emissões atmosféricas':'mr','Ar / emissões':'mr','Efluente líquido':'me','Efluente':'me'};
+var MICON  = {'Água superficial':'ti-droplet','Água subterrânea':'ti-droplet','Solo':'ti-mountain','Sedimento':'ti-layers','Ar / emissões atmosféricas':'ti-wind','Efluente líquido':'ti-test-pipe'};
+function matTag(m){ var c=MCLASS[m]||'ma'; return m?'<span class="mat '+c+'">'+m.split(' ')[0]+'</span>':''; }
+function critBadge(c){
+  if(!c) return '';
+  if(c.startsWith('Alta')) return '<span class="b br">Alta</span>';
+  if(c.startsWith('Média')) return '<span class="b ba">Média</span>';
+  return '<span class="b bx">Baixa</span>';
+}
+function statusBadge(s){
+  var m={'aprovacao':'<span class="b ba">Aprovação</span>','compra':'<span class="b bb">Em compra</span>','concluido':'<span class="b bg">Concluído</span>','rejeitado':'<span class="b br">Rejeitado</span>'};
+  return m[s]||'<span class="b bx">'+s+'</span>';
+}
+function fornStatus(s){
+  if(!s) return '<span class="b bx">—</span>';
+  if(s==='Aprovado') return '<span class="b bg">Aprovado</span>';
+  if(s.startsWith('Suspenso')||s==='Descredenciado') return '<span class="b br">'+s.split(' ')[0]+'</span>';
+  return '<span class="b ba">'+s.split(' ')[0]+'</span>';
+}
+function fmt(iso){ try{ return new Date(iso+'T12:00').toLocaleDateString('pt-BR'); }catch(e){ return iso||'—'; } }
+function gv(id){ var e=document.getElementById(id); return e?e.value:''; }
+function sv(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; }
+function clr(ids){ ids.forEach(function(id){ sv(id,''); }); }
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash() {
+  var reqs = DB.get('requisicoes')||[];
+  var ins  = DB.get('insumos')||[];
+  var forns= DB.get('fornecedores')||[];
+  var aber = reqs.filter(function(r){ return r.status!=='concluido'&&r.status!=='rejeitado'; }).length;
+  document.getElementById('mReq').textContent = aber;
+  document.getElementById('mIns').textContent = ins.length;
+  var fornAp   = forns.filter(function(f){ return f.status==='Aprovado'; }).length;
+  var fornQual = forns.filter(function(f){ return f.status&&f.status!=='Aprovado'&&!f.status.startsWith('Desc'); }).length;
+  document.getElementById('mFornAp').textContent   = fornAp;
+  document.getElementById('msFornAp').textContent  = 'de '+forns.length+' cadastrados';
+  document.getElementById('mFornQual').textContent = fornQual;
+  document.getElementById('msFornQual').textContent= fornQual===1?'fornecedor':'fornecedores';
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var lim30 = new Date(hoje); lim30.setDate(lim30.getDate()+30);
+  var venc = ins.filter(function(i){ if(!i.valMin) return false; var d=new Date(i.valMin+'T12:00'); return d>=hoje&&d<=lim30; }).length;
+  document.getElementById('mVenc').textContent = venc;
+  document.getElementById('msVenc').textContent = venc===0?'nenhum vencendo':'insumo'+(venc===1?'':'s');
+  var metVenc = document.getElementById('metVenc');
+  metVenc.style.borderColor = venc>0?'#EF9F27':'';
+  metVenc.style.background  = venc>0?'var(--abg)':'';
+  document.getElementById('mVenc').style.color = venc>0?'var(--atx)':'';
+  document.getElementById('msReq').textContent  = aber===0?'nenhum': reqs.filter(function(r){return r.status==='aprovacao';}).length+' aguard. aprov.';
+  document.getElementById('msIns').textContent  = ins.length===0?'catálogo vazio': ins.filter(function(i){return i.critici&&i.critici.startsWith('Alta');}).length+' críticos';
+  var box = document.getElementById('dashReqs');
+  box.innerHTML = '';
+  var rec = reqs.slice(-3).reverse();
+  if(rec.length===0){ box.innerHTML='<div class="empty"><i class="ti ti-file-text"></i><div class="et">Nenhum pedido de compra</div><div class="es">Crie na aba Compras</div></div>'; return; }
+  rec.forEach(function(r){
+    var d=document.createElement('div'); d.className='li';
+    d.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+(MICON[r.matriz]||'ti-flask')+'"></i></div>'
+      +'<div class="lib"><div class="lit">'+r.insumo+'</div><div class="lis">'+r.id+(r.tipo?' · '+r.tipo.split(' ')[0]:'')+'</div><div class="trow">'+matTag(r.matriz)+critBadge(r.critici)+'</div></div>'
+      +'<div class="lir">'+statusBadge(r.status)+'</div>';
+    box.appendChild(d);
+  });
+}
+
+// ============================================================
+// PEDIDOS DE COMPRA
+// ============================================================
+function salvarReq() {
+  var ins = gv('rIns').trim();
+  if(!ins){ toast('Preencha o nome do insumo'); return; }
+  var id = 'PC-'+String(reqC).padStart(3,'0'); reqC++; DB.set('reqC',reqC);
+  var fornIdx=gv('rForn');
+  var fornNome='', fornEmail='';
+  if(fornIdx!==''){
+    var forns=DB.get('fornecedores')||[];
+    var fRef=forns[parseInt(fornIdx)];
+    if(fRef){ fornNome=fRef.nome; fornEmail=fRef.contato||''; }
+  } else {
+    // fallback: pegar do catálogo se veio de lá
+    var catIdx2=gv('rCat');
+    if(catIdx2!==''){
+      var insRef2=(DB.get('insumos')||[])[parseInt(catIdx2)];
+      if(insRef2){ fornNome=insRef2.forn||''; fornEmail=insRef2.fornEmail||''; }
+    }
+  }
+  var solic = gv('rSolic');
+  var solicNome = '';
+  if(solic!==''){
+    var users=DB.get('usuarios')||[];
+    var su=users[parseInt(solic)];
+    if(su) solicNome=su.nome;
+  }
+  DB.push('requisicoes',{id:id,insumo:ins,tipo:gv('rTipo'),matriz:gv('rMat'),critici:gv('rCrit'),spec:gv('rSpec'),qtd:gv('rQtd'),solic:solicNome,data:gv('rData'),just:gv('rJust'),forn:fornNome,fornEmail:fornEmail,status:'aprovacao',criadoEm:new Date().toISOString()});
+  fecharSheet('shReq');
+  clr(['rIns','rSpec','rQtd','rData','rJust']); sv('rCat',''); sv('rSolic',''); sv('rForn',''); sv('rFornEmail','');
+  renderReqs(); renderDash();
+  toast(id+' enviado para aprovação ✓');
+}
+
+var filtroReqAtivo='todas';
+function renderReqs(filtro,busca) {
+  var reqs = DB.get('requisicoes')||[];
+  var lista = document.getElementById('liReq');
+  lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
+  var empty = document.getElementById('eReq');
+  var f = filtro!==undefined?filtro:filtroReqAtivo;
+  var b = busca||'';
+  var data = reqs.slice().reverse().filter(function(r){
+    if(f==='alta' && !(r.critici&&r.critici.startsWith('Alta'))) return false;
+    if(f==='aprovacao' && r.status!=='aprovacao') return false;
+    if(f==='compra' && r.status!=='compra') return false;
+    if(b && JSON.stringify(r).toLowerCase().indexOf(b.toLowerCase())<0) return false;
+    return true;
+  });
+  empty.style.display = data.length===0?'':'none';
+  data.forEach(function(r){
+    var allReqs=DB.get('requisicoes')||[];
+    var realIdx=allReqs.findIndex(function(x){ return x.id===r.id; });
+    var el=document.createElement('div'); el.className='li';
+    el.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+(MICON[r.matriz]||'ti-flask')+'"></i></div>'
+      +'<div class="lib"><div class="lit">'+r.insumo+'</div><div class="lis">'+r.id+(r.tipo?' · '+r.tipo.split(' ')[0]:'')+'</div><div class="trow">'+matTag(r.matriz)+critBadge(r.critici)+'</div></div>'
+      +'<div class="lir">'+statusBadge(r.status)+'<i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px;margin-top:4px"></i></div>';
+    (function(idx){ el.onclick=function(){ verReqDetalhe(idx); }; })(realIdx);
+    lista.appendChild(el);
+  });
+}
+function buscarReq(q){ renderReqs(filtroReqAtivo,q); }
+function filtroReq(tipo,btn){
+  filtroReqAtivo=tipo;
+  document.querySelectorAll('#pg-req .btn').forEach(function(b){ b.style.borderColor=''; b.style.color=''; });
+  if(btn){ btn.style.borderColor='var(--g)'; btn.style.color='var(--g)'; }
+  renderReqs();
+}
+
+function verReqDetalhe(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  document.getElementById('dReqT').textContent=r.insumo;
+  document.getElementById('dReqS').textContent=r.id+' · '+new Date(r.criadoEm).toLocaleDateString('pt-BR');
+  var histHtml='';
+  if(r.historico&&r.historico.length>0){
+    r.historico.slice().reverse().forEach(function(h){
+      histHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+h.acao+'</div>'
+        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(h.data).toLocaleDateString('pt-BR')+(h.resp?' · '+h.resp:'')+'</div>'
+        +(h.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+h.obs+'</div>':'')
+        +(h.sig?'<div style="margin-top:5px"><img src="'+h.sig+'" style="height:40px;border:1px solid var(--bd);border-radius:6px;background:#fff"></div>':'')
+        +'</div>';
+    });
+  } else {
+    histHtml='<div class="ah" style="color:var(--tx3);font-size:12.5px;padding:14px">Nenhuma movimentação</div>';
+  }
+  var aprovBtn='';
+  var p = usuarioAtual?usuarioAtual.perfil:'';
+  if(r.status==='aprovacao'&&(temPerfil(usuarioAtual,'admin')||temPerfil(usuarioAtual,'aprovador'))){
+    aprovBtn='<button class="btn btp btf" style="margin-top:4px" onclick="prepAprov('+idx+')"><i class="ti ti-check"></i>Aprovar / Rejeitar</button>';
+  } else if(r.status==='compra'){
+    aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
+      +'<button class="btn btp btf" onclick="concluirReq('+idx+')"><i class="ti ti-package"></i>Marcar como concluída</button>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
+      +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
+      +'</div></div>';
+  } else if(r.status==='concluido'){
+    var jaAvaliado = r.avaliacao ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-check"></i><div>Avaliado: <strong>'+r.avaliacao.resultado+'</strong></div></div>' : '';
+    var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado: <strong>'+r.avaliacaoForn.resultado+'</strong> · ⭐ '+r.avaliacaoForn.nota+'/5</div></div>' : '';
+    aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
+      +(!r.avaliacao?'<button class="btn btp btf" onclick="prepAvalPC('+idx+')"><i class="ti ti-star"></i>Avaliar pedido</button>':'')
+      +jaAvaliado
+      +(r.forn&&!r.avaliacaoForn?'<button class="btn bto btf" onclick="prepAvalFornPC('+idx+')"><i class="ti ti-building-store"></i>Avaliar fornecedor</button>':'')
+      +jaAvalForn
+      +'<div style="display:flex;gap:8px">'
+      +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
+      +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
+      +'</div></div>';
+  }
+  document.getElementById('dReqB').innerHTML=
+    '<div class="trow" style="margin-bottom:13px">'+statusBadge(r.status)+matTag(r.matriz)+critBadge(r.critici)+'</div>'
+    +'<div class="card" style="margin-bottom:11px">'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Tipo</div><div class="iv" style="font-size:12px">'+(r.tipo||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Especificação</div><div class="iv" style="font-size:12px">'+(r.spec||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Quantidade</div><div class="iv">'+(r.qtd||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Solicitante</div><div class="iv">'+(r.solic||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor</div><div class="iv">'+(r.forn||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Data necessária</div><div class="iv">'+(r.data?fmt(r.data):'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Justificativa</div><div class="iv" style="font-size:12px;text-align:right">'+(r.just||'—')+'</div></div>'
+    +'</div>'
+    +(aprovBtn?aprovBtn+'<div style="height:12px"></div>':'')
+    +(r.avaliacao?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do pedido</div>'
+      +'<div class="card" style="margin-bottom:11px">'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Resultado</div><div class="iv">'+r.avaliacao.resultado+'</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacao.criteriosOK+'/6</div></div>'
+      +(r.avaliacao.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacao.obs+'</div></div>':'')
+      +'</div>':'')
+    +(r.avaliacaoForn?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do fornecedor</div>'
+      +'<div class="card" style="margin-bottom:11px">'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor</div><div class="iv">'+(r.forn||'—')+'</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Resultado</div><div class="iv">'+r.avaliacaoForn.resultado+'</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Nota</div><div class="iv">⭐ '+r.avaliacaoForn.nota+'/5</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacaoForn.criteriosOK+'/6</div></div>'
+      +(r.avaliacaoForn.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacaoForn.obs+'</div></div>':'')
+      +'</div>':'')
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de movimentações</div>'
+    +'<div class="card" style="margin-bottom:13px">'+histHtml+'</div>';
+  abrirDetalhe('dReq');
+}
+
+function prepAprov(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  document.getElementById('aprovIdx').value=idx;
+  document.getElementById('aprovInfo').textContent=r.id+' — '+r.insumo;
+  sv('aprovDec','compra'); sv('aprovObs','');
+  popularAprovSelect();
+  fecharDetalhe('dReq');
+  abrirSheet('shAprov');
+}
+
+function popularAprovSelect(){
+  var sel=document.getElementById('aprovResp');
+  if(!sel) return;
+  var users=DB.get('usuarios')||[];
+  sel.innerHTML='<option value="">— Selecione —</option>';
+  users.filter(function(u){ return temPerfil(u,'admin')||temPerfil(u,'aprovador'); }).forEach(function(u){
+    var o=document.createElement('option');
+    o.value=u.nome;
+    o.textContent=u.nome;
+    o.dataset.sig=u.assinatura||'';
+    sel.appendChild(o);
+  });
+  // Pré-selecionar usuário atual
+  if(usuarioAtual&&(temPerfil(usuarioAtual,'admin')||temPerfil(usuarioAtual,'aprovador'))){
+    sel.value=usuarioAtual.nome;
+    carregarSigAprovador(usuarioAtual.nome);
+  }
+}
+
+function carregarSigAprovador(nome){
+  var preview=document.getElementById('sigAprovPreview');
+  var imgEl=document.getElementById('sigAprovImg');
+  if(!nome){ preview.style.display='none'; return; }
+  var users=DB.get('usuarios')||[];
+  var u=users.find(function(x){ return x.nome===nome; });
+  if(u&&u.assinatura){
+    imgEl.src=u.assinatura;
+    preview.style.display='block';
+  } else {
+    preview.style.display='none';
+  }
+  // Limpar qualquer desenho manual ao trocar de aprovador
+  limparAssinatura('sigAprov');
+}
+
+function salvarAprov(){
+  var idx=parseInt(document.getElementById('aprovIdx').value);
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  var dec=gv('aprovDec');
+  var resp=gv('aprovResp').trim();
+  var obs=gv('aprovObs').trim();
+
+  // Prioridade: 1) desenho manual no canvas, 2) assinatura do cadastro
+  var sig=canvasToDataURL('sigAprov');
+  if(!sig){
+    var users=DB.get('usuarios')||[];
+    var u=users.find(function(x){ return x.nome===resp; });
+    if(u&&u.assinatura) sig=u.assinatura;
+  }
+
+  var labels={'compra':'Aprovado — em compra','aprovacao':'Devolvido para revisão','rejeitado':'Rejeitado'};
+  if(!r.historico) r.historico=[];
+  r.historico.push({acao:labels[dec]||dec,resp:resp,obs:obs,sig:sig||null,data:new Date().toISOString()});
+  r.status=dec;
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  fecharSheet('shAprov');
+  renderReqs(); renderDash();
+  var msg=dec==='compra'?'✅ Aprovado':dec==='rejeitado'?'❌ Rejeitado':'🔄 Devolvido para revisão';
+  toast(msg);
+  setTimeout(function(){ verReqDetalhe(idx); },300);
+}
+
+function concluirReq(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  if(!r.historico) r.historico=[];
+  r.historico.push({acao:'Concluída — insumo recebido',data:new Date().toISOString()});
+  r.status='concluido';
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  fecharDetalhe('dReq');
+  renderReqs(); renderDash();
+  toast('Pedido concluído ✓');
+}
+
+function preencherReqDoCatalogo(idx){
+  if(!idx) return;
+  var ins=(DB.get('insumos')||[])[parseInt(idx)];
+  if(!ins) return;
+  sv('rIns',ins.nome||ins.insumo||'');
+  sv('rTipo',ins.tipo||'');
+  sv('rSpec',ins.spec||'');
+  sv('rMat',ins.matriz||'');
+  // pré-selecionar fornecedor pelo nome
+  if(ins.forn){
+    var forns=DB.get('fornecedores')||[];
+    var fIdx=forns.findIndex(function(f){ return f.nome===ins.forn; });
+    if(fIdx>=0){
+      var sel=document.getElementById('rForn');
+      if(sel){ sel.value=fIdx; sincFornReq(fIdx); }
+    } else {
+      sv('rFornEmail',ins.fornEmail||'');
+    }
+  }
+}
+
+function atualizarCatalogSelect(){
+  var sel=document.getElementById('rCat');
+  if(!sel) return;
+  var ins=DB.get('insumos')||[];
+  sel.innerHTML='<option value="">— ou escolha um insumo cadastrado —</option>';
+  ins.forEach(function(i,idx){
+    var o=document.createElement('option'); o.value=idx; o.textContent=i.nome||i.insumo||''; sel.appendChild(o);
+  });
+  atualizarFornSelectReq();
+}
+
+function atualizarFornSelectReq(){
+  var sel=document.getElementById('rForn');
+  if(!sel) return;
+  var forns=DB.get('fornecedores')||[];
+  sel.innerHTML='<option value="">— Selecione do cadastro —</option>';
+  forns.forEach(function(f,idx){
+    var o=document.createElement('option'); o.value=idx; o.textContent=f.nome; o.dataset.email=f.contato||''; sel.appendChild(o);
+  });
+}
+
+function sincFornReq(idx){
+  var sel=document.getElementById('rForn');
+  var emailEl=document.getElementById('rFornEmail');
+  if(!sel||!emailEl) return;
+  if(idx===''){ emailEl.value=''; return; }
+  var opt=sel.options[sel.selectedIndex];
+  emailEl.value=opt.dataset.email||'';
+}
+
+// ============================================================
+// INSUMOS
+// ============================================================
+var insFiltroMatriz='';
+function salvarIns(){
+  var nome=gv('iNome').trim();
+  if(!nome){ toast('Preencha o nome do insumo'); return; }
+  var fornSel=document.getElementById('iFornSel');
+  var fornNome=fornSel&&fornSel.selectedIndex>0?fornSel.options[fornSel.selectedIndex].text:'';
+  var fornEmail=gv('iFornEmail');
+  DB.push('insumos',{nome:nome,tipo:gv('iTipo'),matriz:gv('iMat'),critici:gv('iCrit'),spec:gv('iSpec'),forn:fornNome,fornEmail:fornEmail,codigo:gv('iCod'),validade:gv('iVal'),valMin:gv('iValMin'),obs:gv('iObs'),criadoEm:new Date().toISOString()});
+  fecharSheet('shIns');
+  clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail','');
+  if(fornSel) fornSel.selectedIndex=0;
+  renderIns(); atualizarCatalogSelect(); renderDash();
+  toast('"'+nome+'" cadastrado ✓');
+}
+
+function renderIns(busca,mat){
+  var ins=DB.get('insumos')||[];
+  var lista=document.getElementById('liIns');
+  lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
+  var empty=document.getElementById('eIns');
+  var b=busca||document.getElementById('busInsInput').value||'';
+  var m=mat!==undefined?mat:insFiltroMatriz;
+  var data=ins.slice().reverse().filter(function(i){
+    if(m&&!(i.matriz&&i.matriz.toLowerCase().startsWith(m.toLowerCase()))) return false;
+    if(b&&JSON.stringify(i).toLowerCase().indexOf(b.toLowerCase())<0) return false;
+    return true;
+  });
+  empty.style.display=data.length===0?'':'none';
+  data.forEach(function(ins){
+    var el=document.createElement('div'); el.className='li';
+    var ic=MICON[ins.matriz]||'ti-flask';
+    el.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+ic+'"></i></div>'
+      +'<div class="lib"><div class="lit">'+(ins.nome||'—')+'</div><div class="lis">'+(ins.forn||'—')+'</div>'
+      +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span></div></div>'
+      +'<div class="lir"><i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i></div>';
+    (function(item){ el.onclick=function(){ verInsDetalhe(item); }; })(ins);
+    lista.appendChild(el);
+  });
+}
+function buscarIns(q){ renderIns(q,insFiltroMatriz); }
+function filtroIns(m,btn){
+  insFiltroMatriz=m;
+  document.querySelectorAll('#pg-ins .btn').forEach(function(b){ b.style.borderColor=''; b.style.color=''; });
+  if(btn){ btn.style.borderColor='var(--g)'; btn.style.color='var(--g)'; }
+  renderIns();
+}
+
+function verInsDetalhe(ins){
+  document.getElementById('dInsT').textContent=ins.nome||'—';
+  document.getElementById('dInsS').textContent=(ins.matriz||'—')+' · '+(ins.critici?ins.critici.split(' ')[0]:'—');
+  var hoje2=new Date(); hoje2.setHours(0,0,0,0);
+  var lim30b=new Date(hoje2); lim30b.setDate(lim30b.getDate()+30);
+  var valMinHtml='—';
+  if(ins.valMin){
+    var dv=new Date(ins.valMin+'T12:00');
+    var vencendo=dv<=lim30b; var vencido=dv<hoje2;
+    valMinHtml='<span style="color:'+(vencido?'var(--rtx)':vencendo?'#EF9F27':'inherit')+'">'+fmt(ins.valMin)+(vencido?' ⚠ Vencido':vencendo?' ⚠ Vencendo':'')+'</span>';
+  }
+  document.getElementById('dInsB').innerHTML=
+    '<div class="trow" style="margin-bottom:13px">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—')+'</span></div>'
+    +'<div class="card" style="margin-bottom:11px">'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Especificação</div><div class="iv" style="font-size:12px">'+(ins.spec||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor pref.</div><div class="iv">'+(ins.forn||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">E-mail fornecedor</div><div class="iv" style="font-size:12px">'+(ins.fornEmail||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Validade mínima</div><div class="iv">'+(ins.validade?ins.validade+' meses':'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Validade do lote</div><div class="iv">'+valMinHtml+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Código</div><div class="iv">'+(ins.codigo||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Cadastrado em</div><div class="iv">'+new Date(ins.criadoEm).toLocaleDateString('pt-BR')+'</div></div>'
+    +'</div>'
+    +(ins.obs?'<div style="background:var(--bg2);border-radius:var(--r);padding:11px 12px;font-size:13px;color:var(--tx2);margin-bottom:12px">'+ins.obs+'</div>':'')
+    +'<button class="btn btp btf" onclick="reqDoInsumo(\''+encodeURIComponent(JSON.stringify(ins))+'\')"><i class="ti ti-send"></i>Requisitar este insumo</button>';
+  abrirDetalhe('dIns');
+}
+
+function reqDoInsumo(enc){
+  var ins=JSON.parse(decodeURIComponent(enc));
+  sv('rIns',ins.nome||'');
+  sv('rTipo',ins.tipo||'');
+  sv('rSpec',ins.spec||'');
+  sv('rMat',ins.matriz||'');
+  fecharDetalhe('dIns');
+  abrirSheet('shReq');
+}
+
+// ============================================================
+// FORNECEDORES
+// ============================================================
+function atualizarFornSelect(){
+  var sel=document.getElementById('iFornSel');
+  if(!sel) return;
+  var forns=DB.get('fornecedores')||[];
+  sel.innerHTML='<option value="">— Selecione do cadastro —</option>';
+  forns.forEach(function(f,idx){
+    var o=document.createElement('option'); o.value=idx; o.textContent=f.nome; o.dataset.email=f.contato||''; sel.appendChild(o);
+  });
+}
+
+function sincFornIns(idx){
+  var sel=document.getElementById('iFornSel');
+  var emailEl=document.getElementById('iFornEmail');
+  if(!sel||!emailEl) return;
+  if(idx===''){ emailEl.value=''; return; }
+  var opt=sel.options[sel.selectedIndex];
+  emailEl.value=opt.dataset.email||'';
+}
+
+function salvarForn(){
+  var nome=gv('fNome').trim();
+  if(!nome){ toast('Preencha a razão social'); return; }
+  DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:gv('fStat'),contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,avaliacoes:[],criadoEm:new Date().toISOString()});
+  fecharSheet('shForn');
+  clr(['fNome','fCnpj','fEspec','fCont','fObs']);
+  renderForn(); renderDash(); atualizarFornSelect(); atualizarFornSelectReq();
+  toast(nome+' cadastrado ✓');
+}
+
+function renderForn(){
+  var forns=DB.get('fornecedores')||[];
+  var lista=document.getElementById('liForn');
+  lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
+  var empty=document.getElementById('eForn');
+  if(forns.length===0){ empty.style.display=''; return; }
+  empty.style.display='none';
+  forns.forEach(function(f,idx){
+    var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
+    var nota=f.nota?f.nota.toFixed(1):'—';
+    var nAv=f.avaliacoes?f.avaliacoes.length:0;
+    var el=document.createElement('div'); el.className='li';
+    el.innerHTML='<div class="lic" style="background:var(--gbg);color:var(--gtx);font-size:13px;font-weight:700">'+ini+'</div>'
+      +'<div class="lib"><div class="lit">'+f.nome+'</div><div class="lis">'+(f.espec||f.matriz||'—')+'</div>'
+      +'<div style="margin-top:3px;font-size:10.5px;color:var(--tx3)">'+(nota!=='—'?'⭐ '+nota+'/5':'Sem avaliação')+' · '+nAv+' aval.</div></div>'
+      +'<div class="lir">'+fornStatus(f.status)+'<i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px;margin-top:5px"></i></div>';
+    (function(i){ el.onclick=function(){ verFornDetalhe(i); }; })(idx);
+    lista.appendChild(el);
+  });
+}
+
+function verFornDetalhe(idx){
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx]; if(!f) return;
+  document.getElementById('dFornT').textContent=f.nome;
+  document.getElementById('dFornS').textContent=(f.espec||f.matriz||'—');
+  var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
+  var nota=f.nota?f.nota.toFixed(1):'—';
+  var critNomes=['Qualidade dos insumos','Conformidade documental','Cumprimento de prazos','Tratamento de NC','Capacidade técnica'];
+  var ul=f.avaliacoes&&f.avaliacoes.length>0?f.avaliacoes[f.avaliacoes.length-1]:null;
+  var critHtml='';
+  if(ul&&ul.scores){
+    critHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Última avaliação — critérios</div>'
+      +'<div class="card" style="padding:12px 14px;margin-bottom:11px">';
+    critNomes.forEach(function(n,i){
+      var s=ul.scores[i]||0;
+      critHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/5</strong></div>'
+        +'<div class="pb"><div class="pbv" style="width:'+(s*20)+'%;'+(s<3?'background:#EF9F27':'')+'"></div></div></div>';
+    });
+    critHtml+='</div>';
+  }
+  var avalHtml='';
+  if(f.avaliacoes&&f.avaliacoes.length>0){
+    f.avaliacoes.slice().reverse().forEach(function(a){
+      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+a.decisao+'</div>'
+        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Nota '+a.nota+'/5</div>'
+        +(a.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+a.obs+'</div>':'')+'</div>';
+    });
+  } else {
+    avalHtml='<div class="empty" style="padding:22px"><i class="ti ti-star"></i><div class="et" style="font-size:13px">Sem avaliações</div></div>';
+  }
+  document.getElementById('dFornB').innerHTML=
+    '<div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:var(--rl);padding:12px;margin-bottom:12px">'
+    +'<div style="width:46px;height:46px;background:var(--gbg);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gtx)">'+ini+'</div>'
+    +'<div><div style="font-size:15px;font-weight:700">'+f.nome+'</div>'+fornStatus(f.status)
+    +(nota!=='—'?'<div style="font-size:11px;color:var(--tx3);margin-top:3px">⭐ '+nota+'/5 · '+(f.avaliacoes?f.avaliacoes.length:0)+' avaliações</div>':'')+'</div></div>'
+    +'<div class="card" style="margin-bottom:11px">'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">CNPJ</div><div class="iv">'+(f.cnpj||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Especialidade</div><div class="iv">'+(f.espec||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Matrizes</div><div class="iv">'+(f.matriz||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px"><div class="ik">Contato</div><div class="iv">'+(f.contato||'—')+'</div></div>'
+    +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Reavaliação</div><div class="iv">'+(f.period||'Anual')+'</div></div>'
+    +'</div>'
+    +critHtml
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de avaliações</div>'
+    +'<div class="card" style="margin-bottom:13px">'+avalHtml+'</div>'
+    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>Nova avaliação</button>';
+  abrirDetalhe('dForn');
+}
+
+var aScores=[0,0,0,0,0];
+function prepAval(idx){
+  document.getElementById('avalIdx').value=idx;
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx];
+  document.getElementById('avalInfo').textContent=f.nome+(f.espec?' · '+f.espec:'');
+  aScores=[0,0,0,0,0];
+  for(var i=0;i<5;i++){
+    document.getElementById('sv'+i).textContent='—';
+    var box=document.getElementById('sb'+i); box.innerHTML='';
+    for(var v=1;v<=5;v++){
+      var b=document.createElement('button'); b.className='sb3'; b.textContent=v;
+      (function(ci,cv){ b.onclick=function(){ setAvalScore(ci,cv); }; })(i,v);
+      box.appendChild(b);
+    }
+  }
+  sv('avalObs',''); sv('avalProx','');
+  document.getElementById('notaG').textContent='—';
+  fecharDetalhe('dForn');
+  abrirSheet('shAval');
+}
+
+function setAvalScore(ci,cv){
+  aScores[ci]=cv;
+  document.getElementById('sv'+ci).textContent=cv+'/5';
+  var btns=document.querySelectorAll('#sb'+ci+' .sb3');
+  for(var j=0;j<btns.length;j++) btns[j].classList.toggle('on',j+1===cv);
+  var vals=aScores.filter(function(v){ return v>0; });
+  if(vals.length>0){ document.getElementById('notaG').textContent=(vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1); }
+}
+
+function salvarAval(){
+  var idx=parseInt(document.getElementById('avalIdx').value);
+  if(aScores.every(function(v){ return v===0; })){ toast('Atribua pelo menos uma nota'); return; }
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx];
+  var vals=aScores.filter(function(v){ return v>0; });
+  var med=parseFloat((vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1));
+  var aval={data:new Date().toISOString(),scores:aScores.slice(),nota:med,decisao:gv('avalDec'),obs:gv('avalObs'),proxima:gv('avalProx')};
+  if(!f.avaliacoes) f.avaliacoes=[];
+  f.avaliacoes.push(aval); f.nota=med; f.status=aval.decisao;
+  forns[idx]=f; DB.set('fornecedores',forns);
+  fecharSheet('shAval'); aScores=[0,0,0,0,0];
+  renderForn(); renderDash();
+  toast('Avaliação salva — nota '+med+'/5 ✓');
+  setTimeout(function(){ verFornDetalhe(idx); },300);
+}
+
+// ============================================================
+// CAMPANHAS
+// ============================================================
+// ============================================================
+// NC
+// ============================================================
+function salvarNc(){
+  var desc=gv('ncDesc').trim();
+  if(!desc){ toast('Preencha a descrição'); return; }
+  var id='NC-'+String(ncC).padStart(3,'0'); ncC++; DB.set('ncC',ncC);
+  DB.push('ncs',{id:id,desc:desc,origem:gv('ncOri'),pedido:gv('ncPed'),grav:gv('ncGrav'),resp:gv('ncResp'),prazo:gv('ncPrazo'),contencao:gv('ncCont'),status:'Em tratamento',criadoEm:new Date().toISOString()});
+  fecharSheet('shNc');
+  clr(['ncDesc','ncPed','ncResp','ncPrazo','ncCont']);
+  renderNc();
+  toast('#'+id+' registrada ✓');
+}
+
+function renderNc(){
+  var ncs=DB.get('ncs')||[];
+  var lista=document.getElementById('liNc');
+  lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
+  var empty=document.getElementById('eNc');
+  if(ncs.length===0){ empty.style.display=''; return; }
+  empty.style.display='none';
+  var gc={'Crítica — risco imediato à validade dos resultados':'br','Maior — impacto significativo':'ba','Menor — impacto limitado':'bx'};
+  var gl={'Crítica — risco imediato à validade dos resultados':'Crítica','Maior — impacto significativo':'Maior','Menor — impacto limitado':'Menor'};
+  ncs.slice().reverse().forEach(function(n){
+    var g=gc[n.grav]||'ba'; var l=gl[n.grav]||'NC';
+    var el=document.createElement('div'); el.className='li';
+    el.innerHTML='<div class="lic" style="background:var(--rbg);color:var(--rtx)"><i class="ti ti-alert-triangle"></i></div>'
+      +'<div class="lib"><div class="lit">#'+n.id+' · '+n.desc.substring(0,42)+(n.desc.length>42?'…':'')+'</div>'
+      +'<div class="lis">'+n.origem+(n.pedido?' · '+n.pedido:'')+'</div>'
+      +'<div class="trow"><span class="b '+g+'">'+l+'</span><span class="b ba">Em tratamento</span></div></div>'
+      +'<div class="lir"><i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i></div>';
+    lista.appendChild(el);
+  });
+}
+
+// ============================================================
+// RECEPÇÃO — carrega PCs em compra automaticamente
+// ============================================================
+function popularPCSelect(){
+  var sel=document.getElementById('vPc');
+  if(!sel) return;
+  var reqs=DB.get('requisicoes')||[];
+  var pendentes=reqs.filter(function(r){ return r.status==='compra'; });
+  sel.innerHTML='<option value="">— Selecione o pedido —</option>';
+  pendentes.forEach(function(r,i){
+    var o=document.createElement('option');
+    o.value=r.id; o.textContent=r.id+' — '+r.insumo+(r.qtd?' ('+r.qtd+')':'');
+    o.dataset.insumo=r.insumo; sel.appendChild(o);
+  });
+  if(pendentes.length===0){
+    var o=document.createElement('option'); o.disabled=true; o.textContent='Nenhum pedido em compra'; sel.appendChild(o);
+  }
+}
+
+function preencherRecepcaoDoPC(pcId){
+  if(!pcId) return;
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs.find(function(x){ return x.id===pcId; });
+  if(r){ sv('vIns',r.insumo||''); }
+}
+
+function popularUserSelects(){
+  var users=DB.get('usuarios')||[];
+  // select de solicitante no pedido
+  var selS=document.getElementById('rSolic');
+  if(selS){
+    selS.innerHTML='<option value="">— Selecione —</option>';
+    users.forEach(function(u,i){
+      var o=document.createElement('option'); o.value=i; o.textContent=u.nome+' ('+perfilLabel(u.perfis||u.perfil)+')'; selS.appendChild(o);
+    });
+  }
+  // select responsável na recepção
+  var selR=document.getElementById('vResp');
+  if(selR){
+    selR.innerHTML='<option value="">— Selecione —</option>';
+    users.forEach(function(u,i){
+      var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o);
+    });
+  }
+}
+
+function preencherSolicitanteLogado(){
+  if(!usuarioAtual) return;
+  var sel = document.getElementById('rSolic');
+  if(!sel) return;
+  var users = DB.get('usuarios')||[];
+  var idx = users.findIndex(function(u){ return u.nome === usuarioAtual.nome; });
+  if(idx >= 0) sel.value = idx;
+}
+
+function preencherResponsavelLogado(){
+  if(!usuarioAtual) return;
+  var sel = document.getElementById('vResp');
+  if(!sel) return;
+  sel.value = usuarioAtual.nome;
+}
+
+function salvarVerif(){
+  var ins=gv('vIns').trim();
+  if(!ins){ toast('Preencha o insumo'); return; }
+  var pcId=gv('vPc');
+  DB.push('verificacoes',{pc:pcId,insumo:ins,lote:gv('vLote'),validade:gv('vVal'),result:gv('vRes'),resp:gv('vResp'),obs:gv('vObs'),checklist:[1,2,3,4,5,6,7].map(function(i){ var e=document.getElementById('ck'+i); return e?e.checked:false; }),criadoEm:new Date().toISOString()});
+  // Se resultado aprovado, marcar pedido como concluído
+  if(pcId&&gv('vRes').startsWith('Aprovado')){
+    var reqs=DB.get('requisicoes')||[];
+    var idx=reqs.findIndex(function(r){ return r.id===pcId; });
+    if(idx>=0){
+      if(!reqs[idx].historico) reqs[idx].historico=[];
+      reqs[idx].historico.push({acao:'Recebido e aprovado na recepção',resp:gv('vResp'),data:new Date().toISOString()});
+      reqs[idx].status='concluido';
+      DB.set('requisicoes',reqs);
+    }
+  }
+  fecharSheet('shVerif');
+  clr(['vIns','vLote','vObs']); sv('vVal',''); sv('vPc',''); sv('vResp','');
+  [1,2,3,4,5,6,7].forEach(function(i){ var e=document.getElementById('ck'+i); if(e) e.checked=false; });
+  renderDash(); renderReqs();
+  toast('Verificação registrada ✓');
+}
+
+// ============================================================
+// USUÁRIOS
+// ============================================================
+function novoUsr(){
+  sv('uIdx','-1');
+  clr(['uNome','uEmail','uSenha']);
+  setPerfisCheckbox([]);
+  document.getElementById('shUsrTitulo').childNodes[0].textContent = 'Novo usuário';
+  document.getElementById('btnSalvarUsr').innerHTML = '<i class="ti ti-check"></i>Cadastrar usuário';
+  document.getElementById('uSenhaLabel').textContent = '(mín. 4 caracteres)';
+  document.getElementById('uSenha').placeholder = '••••••';
+  limparAssinatura('sigUsr');
+  abrirSheet('shUsr');
+}
+
+function editarUsr(idx){
+  var users = DB.get('usuarios')||[];
+  var u = users[idx]; if(!u) return;
+  sv('uIdx', idx);
+  sv('uNome', u.nome||'');
+  sv('uEmail', u.email||'');
+  sv('uSenha', '');
+  setPerfisCheckbox(Array.isArray(u.perfis)?u.perfis:(u.perfil?[u.perfil]:[]));
+  document.getElementById('shUsrTitulo').childNodes[0].textContent = 'Editar usuário';
+  document.getElementById('btnSalvarUsr').innerHTML = '<i class="ti ti-check"></i>Salvar alterações';
+  document.getElementById('uSenhaLabel').textContent = '(deixe em branco para manter a atual)';
+  document.getElementById('uSenha').placeholder = 'Nova senha (opcional)';
+  // Mostrar assinatura existente no canvas depois de abrir
+  abrirSheet('shUsr');
+  setTimeout(function(){
+    limparAssinatura('sigUsr');
+    if(u.assinatura){
+      var canvas = document.getElementById('sigUsr');
+      var img = new Image();
+      img.onload = function(){
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.classList.add('signed');
+      };
+      img.src = u.assinatura;
+    }
+  }, 200);
+}
+
+function salvarUsr(){
+  var idx  = parseInt(document.getElementById('uIdx').value);
+  var nome = gv('uNome').trim();
+  var senha = gv('uSenha').trim();
+  var sig  = canvasToDataURL('sigUsr');
+  var perfis = getPerfisCheckbox();
+
+  if(!nome){ toast('Preencha o nome'); return; }
+  if(perfis.length===0){ toast('Selecione pelo menos uma permissão'); return; }
+
+  var users = DB.get('usuarios')||[];
+
+  if(idx >= 0){
+    // EDIÇÃO
+    var u = users[idx];
+    u.nome   = nome;
+    u.email  = gv('uEmail');
+    u.perfis = perfis;
+    u.perfil = perfis[0]; // compatibilidade
+    if(sig) u.assinatura = sig;
+    if(senha.length >= 4) u.senha = senha;
+    else if(senha.length > 0){ toast('Senha deve ter pelo menos 4 caracteres'); return; }
+    users[idx] = u;
+    DB.set('usuarios', users);
+    toast(nome+' atualizado ✓');
+  } else {
+    // CRIAÇÃO
+    if(senha.length < 4){ toast('Senha deve ter pelo menos 4 caracteres'); return; }
+    DB.push('usuarios',{nome:nome,email:gv('uEmail'),senha:senha,perfis:perfis,perfil:perfis[0],assinatura:sig||null,criadoEm:new Date().toISOString()});
+    toast(nome+' cadastrado ✓');
+  }
+
+  fecharSheet('shUsr');
+  clr(['uNome','uEmail','uSenha']); limparAssinatura('sigUsr');
+  renderUsr(); carregarLoginSelect(); popularUserSelects();
+}
+
+function renderUsr(){
+  var users=DB.get('usuarios')||[];
+  var lista=document.getElementById('liUsr');
+  lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
+  var empty=document.getElementById('eUsr');
+  if(users.length===0){ empty.style.display=''; return; }
+  empty.style.display='none';
+  users.forEach(function(u,idx){
+    var ini=u.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
+    var el=document.createElement('div'); el.className='li';
+    el.innerHTML='<div class="avatar">'+ini+'</div>'
+      +'<div class="lib"><div class="lit">'+u.nome+'</div><div class="lis">'+(u.email||'—')+'</div>'
+      +'<div class="trow">'+perfilBadge(u.perfis||u.perfil)+'</div></div>'
+      +'<div class="lir">'+(u.assinatura?'<span style="font-size:11px;color:var(--g)">✍</span>':'')
+      +'<i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px;margin-top:4px"></i></div>';
+    (function(i){ el.onclick=function(){ editarUsr(i); }; })(idx);
+    lista.appendChild(el);
+  });
+}
+
+// ============================================================
+// ASSINATURA DIGITAL
+// ============================================================
+function iniciarCanvas(id){
+  var canvas = document.getElementById(id);
+  if(!canvas) return;
+
+  // Se já foi inicializado, apenas resetar o estado de desenho
+  if(canvas._sigInit){
+    canvas._sigDrawing = false;
+    return;
+  }
+  canvas._sigInit    = true;
+  canvas._sigDrawing = false;
+
+  // Ajustar tamanho
+  canvas.width  = canvas.offsetWidth || canvas.parentNode.offsetWidth || 320;
+  canvas.height = 120;
+
+  var ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0F6E56';
+  ctx.lineWidth   = 2.5;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  function getPos(e){
+    var rect = canvas.getBoundingClientRect();
+    var src  = e.touches ? e.touches[0] : e;
+    return {
+      x: (src.clientX - rect.left) * (canvas.width  / rect.width),
+      y: (src.clientY - rect.top)  * (canvas.height / rect.height)
+    };
+  }
+
+  function onStart(e){
+    e.preventDefault();
+    canvas._sigDrawing = true;
+    var p = getPos(e);
+    var c = canvas.getContext('2d');
+    c.beginPath();
+    c.moveTo(p.x, p.y);
+    canvas.classList.add('signed');
+  }
+  function onMove(e){
+    e.preventDefault();
+    if(!canvas._sigDrawing) return;
+    var p = getPos(e);
+    var c = canvas.getContext('2d');
+    c.lineTo(p.x, p.y);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(p.x, p.y);
+  }
+  function onEnd(e){
+    canvas._sigDrawing = false;
+    canvas.getContext('2d').beginPath();
+  }
+
+  canvas.addEventListener('mousedown',  onStart);
+  canvas.addEventListener('mousemove',  onMove);
+  canvas.addEventListener('mouseup',    onEnd);
+  canvas.addEventListener('mouseleave', onEnd);
+  canvas.addEventListener('touchstart', onStart, {passive:false});
+  canvas.addEventListener('touchmove',  onMove,  {passive:false});
+  canvas.addEventListener('touchend',   onEnd);
+}
+
+function limparAssinatura(id){
+  var canvas = document.getElementById(id);
+  if(!canvas) return;
+  canvas.width = canvas.width; // reset canvas
+  var ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0F6E56';
+  ctx.lineWidth   = 2.5;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+  canvas.classList.remove('signed');
+  canvas._sigDrawing = false;
+}
+
+function canvasToDataURL(id){
+  var canvas = document.getElementById(id);
+  if(!canvas) return null;
+  var ctx  = canvas.getContext('2d');
+  var w = canvas.width, h = canvas.height;
+  var data = ctx.getImageData(0, 0, w, h).data;
+
+  // Verificar se tem conteúdo
+  var hasContent = false;
+  for(var i = 3; i < data.length; i += 4){ if(data[i] > 0){ hasContent = true; break; } }
+  if(!hasContent) return null;
+
+  // Calcular bounding box do conteúdo desenhado
+  var minX=w, minY=h, maxX=0, maxY=0;
+  for(var y=0; y<h; y++){
+    for(var x=0; x<w; x++){
+      var alpha = data[(y*w+x)*4+3];
+      if(alpha > 0){
+        if(x < minX) minX = x;
+        if(x > maxX) maxX = x;
+        if(y < minY) minY = y;
+        if(y > maxY) maxY = y;
+      }
+    }
+  }
+
+  // Adicionar padding ao redor
+  var pad = 8;
+  minX = Math.max(0, minX - pad);
+  minY = Math.max(0, minY - pad);
+  maxX = Math.min(w, maxX + pad);
+  maxY = Math.min(h, maxY + pad);
+
+  var cw = maxX - minX;
+  var ch = maxY - minY;
+  if(cw <= 0 || ch <= 0) return null;
+
+  // Desenhar só a área recortada em canvas temporário
+  var tmp = document.createElement('canvas');
+  tmp.width  = cw;
+  tmp.height = ch;
+  tmp.getContext('2d').drawImage(canvas, minX, minY, cw, ch, 0, 0, cw, ch);
+  return tmp.toDataURL('image/png');
+}
+
+// Canvas inicializado via abrirSheet com setTimeout
+
+// ============================================================
+// PDF & EMAIL
+// ============================================================
+function gerarPDF(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  var dataEmissao=new Date().toLocaleDateString('pt-BR');
+  var dataNec=r.data?fmt(r.data):'—';
+  var aprovador=''; var sigAprovImg='';
+  if(r.historico){
+    var aprov=r.historico.find(function(h){ return h.acao&&h.acao.indexOf('Aprovado')>=0; });
+    if(aprov){ aprovador=aprov.resp||''; sigAprovImg=aprov.sig||''; }
+  }
+  var users=DB.get('usuarios')||[];
+  // Assinatura do aprovador
+  if(!sigAprovImg&&aprovador){
+    var uAprov=users.find(function(u){ return u.nome===aprovador; });
+    if(uAprov&&uAprov.assinatura) sigAprovImg=uAprov.assinatura;
+  }
+  // Assinatura do solicitante
+  var sigSolicImg='';
+  if(r.solic){
+    var uSolic=users.find(function(u){ return u.nome===r.solic; });
+    if(uSolic&&uSolic.assinatura) sigSolicImg=uSolic.assinatura;
+  }
+  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:32px}'
+    +'.logo{display:flex;align-items:center;gap:12px;margin-bottom:6px}'
+    +'.logo-icon{width:44px;height:44px;background:#0F6E56;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}'
+    +'.logo-name{font-size:20px;font-weight:700;color:#0F6E56}.logo-sub{font-size:11px;color:#666}'
+    +'.divider{border:none;border-top:2px solid #0F6E56;margin:14px 0}'
+    +'.titulo{font-size:17px;font-weight:700;margin-bottom:4px}.subtitulo{font-size:11px;color:#666;margin-bottom:18px}'
+    +'.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:#E1F5EE;color:#085041;margin-bottom:18px}'
+    +'table{width:100%;border-collapse:collapse;margin-bottom:20px}'
+    +'th{background:#0F6E56;color:#fff;padding:8px 10px;text-align:left;font-size:12px}'
+    +'td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}'
+    +'td:first-child{font-weight:600;color:#444;width:38%;font-size:12px}'
+    +'.just{background:#f6f6f4;border-radius:6px;padding:10px 12px;font-size:12px;color:#444;line-height:1.6;margin-bottom:20px}'
+    +'.footer{margin-top:30px;padding-top:14px;border-top:1px solid #ddd;font-size:11px;color:#888;display:flex;justify-content:space-between}'
+    +'.assinatura{margin-top:40px;display:flex;gap:20px}'
+    +'.assin-box{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center}'
+    +'.assin-box .sig-wrap{height:64px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px}'
+    +'.assin-box img{max-height:60px;max-width:160px;object-fit:contain;display:block}'
+    +'.assin-box .linha{border-top:1.5px solid #333;width:100%;padding-top:5px;font-size:10.5px;font-weight:600;color:#333}'
+    +'.assin-box .nome{font-size:10px;color:#777;margin-top:2px}'
+    +'@media print{body{padding:20px}}'
+    +'</style></head><body>'
+    +'<div class="logo"><div class="logo-icon">🌿</div><div><div class="logo-name">Éllu Ambiental</div><div class="logo-sub">ISO/IEC 17025:2017 — Gestão de Compras</div></div></div>'
+    +'<hr class="divider">'
+    +'<div class="titulo">Pedido de Compra</div>'
+    +'<div class="subtitulo">Emitido em '+dataEmissao+' · Ref. '+r.id+'</div>'
+    +'<span class="badge">✅ Aprovado — Em compra</span>'
+    +'<table><tr><th colspan="2">Dados do Pedido</th></tr>'
+    +'<tr><td>Insumo / Descrição</td><td>'+r.insumo+'</td></tr>'
+    +'<tr><td>Tipo</td><td>'+(r.tipo||'—')+'</td></tr>'
+    +'<tr><td>Matriz Ambiental</td><td>'+(r.matriz||'—')+'</td></tr>'
+    +'<tr><td>Criticidade</td><td>'+(r.critici||'—')+'</td></tr>'
+    +'<tr><td>Especificação Técnica</td><td>'+(r.spec||'—')+'</td></tr>'
+    +'<tr><td>Quantidade</td><td>'+(r.qtd||'—')+'</td></tr>'
+    +'<tr><td>Solicitante</td><td>'+(r.solic||'—')+'</td></tr>'
+    +'<tr><td>Fornecedor</td><td>'+(r.forn||'—')+(r.fornEmail?' · '+r.fornEmail:'')+'</td></tr>'
+    +'<tr><td>Data necessária</td><td>'+dataNec+'</td></tr>'
+    +(aprovador?'<tr><td>Aprovado por</td><td>'+aprovador+'</td></tr>':'')
+    +'</table>'
+    +(r.just?'<div style="font-size:11px;font-weight:700;color:#444;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Justificativa Técnica §6.6.1</div><div class="just">'+r.just+'</div>':'')
+    +'<div class="assinatura">'
+    +'<div class="assin-box"><div class="sig-wrap">'+(sigSolicImg?'<img src="'+sigSolicImg+'">':'')+'</div><div class="linha">Solicitante</div><div class="nome">'+(r.solic||'')+'</div></div>'
+    +'<div class="assin-box"><div class="sig-wrap">'+(sigAprovImg?'<img src="'+sigAprovImg+'">':'')+'</div><div class="linha">Aprovador</div><div class="nome">'+(aprovador||'')+'</div></div>'
+    +'</div>'
+    +'<div class="footer"><span>Éllu Ambiental · ISO/IEC 17025:2017 §6.6</span><span>Gerado em '+dataEmissao+'</span></div>'
+    +'</body></html>';
+  var win=window.open('','_blank','width=800,height=600');
+  win.document.write(html); win.document.close(); win.focus();
+  setTimeout(function(){ win.print(); },500);
+}
+
+function enviarEmail(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  var dataNec=r.data?fmt(r.data):'—';
+  var aprovador='';
+  if(r.historico){ var ap=r.historico.find(function(h){ return h.acao&&h.acao.indexOf('Aprovado')>=0; }); if(ap) aprovador=ap.resp||''; }
+  var subject=encodeURIComponent('Pedido de Compra '+r.id+' — '+r.insumo);
+  var para=r.fornEmail||'';
+  var body=encodeURIComponent('Prezados'+(r.forn?' '+r.forn:'')+',\n\nEncaminhamos o Pedido de Compra '+r.id+', aprovado conforme ISO/IEC 17025:2017 §6.6.\n\nDADOS DO PEDIDO\n───────────────────\nInsumo     : '+r.insumo+'\nTipo       : '+(r.tipo||'—')+'\nMatriz     : '+(r.matriz||'—')+'\nEspecif.   : '+(r.spec||'—')+'\nQuantidade : '+(r.qtd||'—')+'\nData nec.  : '+dataNec+'\nSolicitante: '+(r.solic||'—')+'\n'+(aprovador?'Aprovado por: '+aprovador+'\n':'')+(r.just?'\nJustificativa:\n'+r.just+'\n':'')+'───────────────────\nPor favor confirmar recebimento e prazo.\n\nAtenciosamente,\nÉllu Ambiental — ISO/IEC 17025:2017');
+  window.location.href='mailto:'+para+'?subject='+subject+'&body='+body;
+  toast(para?'E-mail aberto para '+r.forn+' ✓':'Cliente de e-mail aberto ✓');
+}
+
+// ============================================================
+// AVALIAÇÃO DO FORNECEDOR POR PEDIDO
+// ============================================================
+var notaFornPC = 0;
+function prepAvalFornPC(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  document.getElementById('avalFornPCIdx').value=idx;
+  document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+' ('+r.insumo+')';
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); if(e) e.checked=false; });
+  notaFornPC=0;
+  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('avalFornPCNotaTxt').textContent='—';
+  sv('avalFornPCRes','Aprovado'); sv('avalFornPCObs','');
+  var selR=document.getElementById('avalFornPCResp');
+  if(selR){
+    var users=DB.get('usuarios')||[];
+    selR.innerHTML='<option value="">— Selecione —</option>';
+    users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
+    if(usuarioAtual) selR.value=usuarioAtual.nome;
+  }
+  fecharDetalhe('dReq');
+  abrirSheet('shAvalFornPC');
+}
+
+function setNotaFornPC(n){
+  notaFornPC=n;
+  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b,i){ b.classList.toggle('on',i<n); });
+  var labels=['','Insatisfatório','Ruim','Regular','Bom','Excelente'];
+  document.getElementById('avalFornPCNotaTxt').textContent=n+'/5 — '+labels[n];
+}
+
+function salvarAvalFornPC(){
+  var idx=parseInt(document.getElementById('avalFornPCIdx').value);
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  if(notaFornPC===0){ toast('Atribua uma nota ao fornecedor'); return; }
+  var cks=[]; var ok=0;
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); var v=e?e.checked:false; cks.push(v); if(v) ok++; });
+  r.avaliacaoForn={
+    forn:r.forn,
+    resultado:gv('avalFornPCRes'),
+    nota:notaFornPC,
+    criterios:cks,
+    criteriosOK:ok,
+    obs:gv('avalFornPCObs'),
+    resp:gv('avalFornPCResp'),
+    data:new Date().toISOString()
+  };
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  // Registrar também no cadastro do fornecedor
+  var forns=DB.get('fornecedores')||[];
+  var fi=forns.findIndex(function(f){ return f.nome===r.forn; });
+  if(fi>=0){
+    if(!forns[fi].avaliacoes) forns[fi].avaliacoes=[];
+    forns[fi].avaliacoes.push({
+      data:r.avaliacaoForn.data,
+      scores:[notaFornPC,notaFornPC,notaFornPC,notaFornPC,notaFornPC],
+      nota:notaFornPC,
+      decisao:gv('avalFornPCRes'),
+      obs:'Pedido '+r.id+' — '+(gv('avalFornPCObs')||''),
+      pedidoId:r.id
+    });
+    forns[fi].nota=notaFornPC;
+    forns[fi].status=gv('avalFornPCRes');
+    DB.set('fornecedores',forns);
+  }
+  fecharSheet('shAvalFornPC');
+  toast('Fornecedor avaliado — nota '+notaFornPC+'/5 ✓');
+  setTimeout(function(){ verReqDetalhe(idx); },300);
+}
+function prepAvalPC(idx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  document.getElementById('avalPCIdx').value=idx;
+  document.getElementById('avalPCInfo').textContent=r.id+' — '+r.insumo+(r.forn?' · '+r.forn:'');
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('apc'+i); if(e) e.checked=false; });
+  sv('avalPCRes','Conforme'); sv('avalPCObs','');
+  // popular avaliador
+  var selR=document.getElementById('avalPCResp');
+  if(selR){
+    var users=DB.get('usuarios')||[];
+    selR.innerHTML='<option value="">— Selecione —</option>';
+    users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
+    if(usuarioAtual) selR.value=usuarioAtual.nome;
+  }
+  fecharDetalhe('dReq');
+  abrirSheet('shAvalPC');
+}
+
+function salvarAvalPC(){
+  var idx=parseInt(document.getElementById('avalPCIdx').value);
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  var cks=[]; var ok=0;
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('apc'+i); var v=e?e.checked:false; cks.push(v); if(v) ok++; });
+  r.avaliacao={
+    resultado:gv('avalPCRes'),
+    criterios:cks,
+    criteriosOK:ok,
+    obs:gv('avalPCObs'),
+    resp:gv('avalPCResp'),
+    data:new Date().toISOString()
+  };
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  fecharSheet('shAvalPC');
+  toast('Avaliação registrada ✓');
+  setTimeout(function(){ verReqDetalhe(idx); },300);
+}
+
+// ============================================================
+// INDICADORES
+// ============================================================
+function renderIndicadores(){
+  var reqs=DB.get('requisicoes')||[];
+  var box=document.getElementById('indConteudo');
+  if(!box) return;
+
+  if(reqs.length===0){
+    box.innerHTML='<div class="empty"><i class="ti ti-chart-bar"></i><div class="et">Sem dados ainda</div><div class="es">Crie pedidos de compra para ver os indicadores</div></div>';
+    return;
+  }
+
+  // --- Por tipo ---
+  var tipos={};
+  reqs.forEach(function(r){ var t=(r.tipo||'Outros').split(' ')[0]; tipos[t]=(tipos[t]||0)+1; });
+  var totalTipo=reqs.length;
+
+  // --- Por fornecedor ---
+  var forns={};
+  reqs.forEach(function(r){ if(r.forn){ forns[r.forn]=(forns[r.forn]||0)+1; } });
+  var fornKeys=Object.keys(forns).sort(function(a,b){ return forns[b]-forns[a]; }).slice(0,6);
+
+  // --- Por status ---
+  var status={aprovacao:0,compra:0,concluido:0,rejeitado:0};
+  reqs.forEach(function(r){ if(status[r.status]!==undefined) status[r.status]++; });
+
+  // --- Quantidade por insumo (agrupado por nome) ---
+  var qtdInsumo={};
+  reqs.forEach(function(r){
+    if(!r.insumo) return;
+    var nome=r.insumo;
+    if(!qtdInsumo[nome]) qtdInsumo[nome]={qtds:[],total:0};
+    if(r.qtd) qtdInsumo[nome].qtds.push(r.qtd);
+    qtdInsumo[nome].total++;
+  });
+  var qtdInsumoKeys=Object.keys(qtdInsumo).sort(function(a,b){ return qtdInsumo[b].total-qtdInsumo[a].total; });
+
+  // Avaliações
+  var avals=reqs.filter(function(r){ return r.avaliacao; });
+  var conformes=avals.filter(function(r){ return r.avaliacao.resultado==='Conforme'; }).length;
+  var mediaOK=avals.length>0?(avals.reduce(function(s,r){ return s+r.avaliacao.criteriosOK; },0)/avals.length).toFixed(1):null;
+
+  function barChart(dados, total, colors){
+    var html='';
+    dados.forEach(function(d){
+      var pct=total>0?Math.round(d.v/total*100):0;
+      var col=colors&&colors[d.k]?colors[d.k]:'var(--g)';
+      html+='<div style="margin-bottom:11px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'
+        +'<span style="color:var(--tx2)">'+d.k+'</span>'
+        +'<span style="font-weight:700">'+d.v+' <span style="font-weight:400;color:var(--tx3)">('+pct+'%)</span></span></div>'
+        +'<div class="pb"><div class="pbv" style="width:'+pct+'%;background:'+col+'"></div></div>'
+        +'</div>';
+    });
+    return html;
+  }
+
+  var statusColors={aprovacao:'#EF9F27',compra:'var(--btx)',concluido:'var(--g)',rejeitado:'var(--rtx)'};
+  var statusLabels={aprovacao:'Aguard. aprovação',compra:'Em compra',concluido:'Concluído',rejeitado:'Rejeitado'};
+  var statusDados=Object.keys(status).filter(function(k){ return status[k]>0; }).map(function(k){ return {k:statusLabels[k],v:status[k],c:statusColors[k]}; });
+
+  var tiposDados=Object.keys(tipos).map(function(k){ return {k:k,v:tipos[k]}; }).sort(function(a,b){ return b.v-a.v; });
+  var fornDados=fornKeys.map(function(k){ return {k:k,v:forns[k]}; });
+
+  box.innerHTML=
+    // RESUMO GERAL — cards de totais
+    '<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Resumo geral</div>'
+    +'<div class="mets" style="margin-bottom:12px">'
+    +'<div class="met"><div class="ml">Total de pedidos</div><div class="mv">'+totalTipo+'</div><div class="ms">desde o início</div></div>'
+    +'<div class="met"><div class="ml">Concluídos</div><div class="mv" style="color:var(--g)">'+status.concluido+'</div><div class="ms">'+(totalTipo>0?Math.round(status.concluido/totalTipo*100)+'% do total':'—')+'</div></div>'
+    +'<div class="met"><div class="ml">Fornecedores</div><div class="mv">'+Object.keys(forns).length+'</div><div class="ms">com pedidos</div></div>'
+    +'<div class="met"><div class="ml">Avaliações</div><div class="mv">'+avals.length+'</div><div class="ms">'+(avals.length>0?Math.round(avals.length/totalTipo*100)+'% avaliados':'nenhuma')+'</div></div>'
+    +'</div>'
+
+    // Status com total
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Status dos pedidos <span style="font-weight:400">— total: '+totalTipo+'</span></div>'
+    +'<div class="card" style="padding:14px;margin-bottom:12px">'+barChart(statusDados,totalTipo,statusColors)+'</div>'
+
+    // Por tipo com total
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Por tipo de insumo <span style="font-weight:400">— total: '+totalTipo+'</span></div>'
+    +'<div class="card" style="padding:14px;margin-bottom:12px">'+barChart(tiposDados,totalTipo,null)+'</div>'
+
+    // Por fornecedor com total
+    +(fornDados.length>0
+      ?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Por fornecedor <span style="font-weight:400">— '+Object.keys(forns).length+' fornecedor'+(Object.keys(forns).length>1?'es':'')+'</span></div>'
+       +'<div class="card" style="padding:14px;margin-bottom:12px">'+barChart(fornDados,totalTipo,null)+'</div>'
+      :'')
+
+    // Avaliações com totais
+    +(avals.length>0
+      ?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliações <span style="font-weight:400">— '+avals.length+' de '+totalTipo+' pedidos</span></div>'
+       +'<div class="card" style="padding:14px;margin-bottom:12px">'
+       +'<div style="display:flex;gap:12px;margin-bottom:14px">'
+       +'<div style="flex:1;background:var(--gbg);border-radius:var(--r);padding:11px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--gtx)">'+avals.length+'</div><div style="font-size:11px;color:var(--gtx)">Avaliados</div></div>'
+       +'<div style="flex:1;background:var(--gbg);border-radius:var(--r);padding:11px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--gtx)">'+conformes+'</div><div style="font-size:11px;color:var(--gtx)">Conformes</div></div>'
+       +'<div style="flex:1;background:var(--bbg);border-radius:var(--r);padding:11px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--btx)">'+mediaOK+'/6</div><div style="font-size:11px;color:var(--btx)">Média critérios</div></div>'
+       +'</div>'
+       +barChart([{k:'Conforme',v:conformes},{k:'Com ressalvas',v:avals.filter(function(r){return r.avaliacao.resultado.indexOf('ressalva')>=0;}).length},{k:'Não conforme',v:avals.filter(function(r){return r.avaliacao.resultado==='Não conforme';}).length}].filter(function(d){return d.v>0;}),avals.length,{'Conforme':'var(--g)','Com ressalvas':'#EF9F27','Não conforme':'var(--rtx)'})
+       +'</div>'
+       +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Lista de pedidos avaliados</div>'
+       +'<div class="card" style="margin-bottom:12px">'
+       +avals.slice().reverse().map(function(r){
+         var av=r.avaliacao;
+         var cor=av.resultado==='Conforme'?'var(--gtx)':av.resultado.indexOf('ressalva')>=0?'#B87800':'var(--rtx)';
+         var icone=av.resultado==='Conforme'?'✅':av.resultado.indexOf('ressalva')>=0?'⚠️':'❌';
+         var critLabel=['Prazo','Qualidade','Documentação','Quantidade','Embalagem','Rastreabilidade'];
+         var oksNames=(av.criterios||[]).map(function(v,i){ return v?critLabel[i]:null; }).filter(Boolean);
+         var nokNames=(av.criterios||[]).map(function(v,i){ return !v?critLabel[i]:null; }).filter(Boolean);
+         return '<div class="ah">'
+           +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+           +'<div style="font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.id+' — '+r.insumo+'</div>'
+           +'<span style="font-size:11px;font-weight:700;color:'+cor+';white-space:nowrap">'+icone+' '+av.resultado+'</span>'
+           +'</div>'
+           +'<div style="font-size:11px;color:var(--tx3);margin-top:3px">'
+           +(av.data?new Date(av.data).toLocaleDateString('pt-BR'):'')+(av.resp?' · '+av.resp:'')
+           +' · '+av.criteriosOK+'/6 critérios'
+           +'</div>'
+           +(oksNames.length?'<div style="font-size:10.5px;color:var(--gtx);margin-top:4px">✓ '+oksNames.join(', ')+'</div>':'')
+           +(nokNames.length?'<div style="font-size:10.5px;color:var(--rtx);margin-top:2px">✗ '+nokNames.join(', ')+'</div>':'')
+           +(av.obs?'<div style="font-size:11px;color:var(--tx2);margin-top:4px;font-style:italic">'+av.obs+'</div>':'')
+           +'</div>';
+       }).join('')
+       +'</div>'
+      :'')
+
+    // Quantidades por insumo
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quantidades solicitadas por insumo</div>'
+    +'<div class="card" style="margin-bottom:12px">'
+    +qtdInsumoKeys.map(function(nome){
+      var d=qtdInsumo[nome];
+      var qtdTxt=d.qtds.length>0?d.qtds.slice(0,3).join(', ')+(d.qtds.length>3?' +mais '+(d.qtds.length-3):''):'—';
+      return '<div class="ir" style="padding:10px 14px">'
+        +'<div class="ik" style="max-width:55%;font-size:12px;white-space:normal">'+nome+'<span style="display:block;font-size:10px;color:var(--tx3)">'+d.total+' pedido'+(d.total>1?'s':'')+'</span></div>'
+        +'<div class="iv" style="font-size:11.5px;color:var(--tx2)">'+qtdTxt+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>';
+}
+var scanStream=null, scanFrame=null, scanAlvo='vLote';
+function abrirScanner(alvo){ scanAlvo=alvo||'vLote'; document.getElementById('scw').classList.remove('hid'); document.getElementById('scRes').style.display='none'; navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}}).then(function(stream){ scanStream=stream; var v=document.getElementById('scv'); v.srcObject=stream; v.onloadedmetadata=function(){ v.play(); requestAnimationFrame(leituraFrame); }; }).catch(function(){ toast('Câmera não disponível'); fecharScanner(); }); }
+function fecharScanner(){ document.getElementById('scw').classList.add('hid'); if(scanStream){ scanStream.getTracks().forEach(function(t){ t.stop(); }); scanStream=null; } if(scanFrame){ cancelAnimationFrame(scanFrame); scanFrame=null; } }
+function leituraFrame(){ var v=document.getElementById('scv'),c=document.getElementById('scc'); if(v.readyState===v.HAVE_ENOUGH_DATA){ c.width=v.videoWidth; c.height=v.videoHeight; var ctx=c.getContext('2d'); ctx.drawImage(v,0,0,c.width,c.height); var code=jsQR(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height,{inversionAttempts:'dontInvert'}); if(code){ document.getElementById('scTxt').textContent=code.data; document.getElementById('scRes').style.display='flex'; if(scanFrame){ cancelAnimationFrame(scanFrame); scanFrame=null; } if(navigator.vibrate) navigator.vibrate(200); return; } } scanFrame=requestAnimationFrame(leituraFrame); }
+function usarScan(){ var val=document.getElementById('scTxt').textContent; var el=document.getElementById(scanAlvo); if(el) el.value=val; fecharScanner(); toast('Código preenchido: '+val); }
+
+// ============================================================
+// PWA
+// ============================================================
+var deferredPrompt=null;
+function detectarPlataforma(){ var ua=navigator.userAgent; return {isIOS:/iphone|ipad|ipod/i.test(ua),isAndroid:/android/i.test(ua),isSafari:/safari/i.test(ua)&&!/chrome/i.test(ua),isChrome:/chrome|chromium|crios/i.test(ua),isEdge:/edg\//i.test(ua),isFirefox:/firefox|fxios/i.test(ua),isStandalone:window.matchMedia('(display-mode: standalone)').matches||navigator.standalone}; }
+function instrucoesPorPlataforma(){
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(r){ if(r.outcome==='accepted') toast('✅ App instalado!'); deferredPrompt=null; }); return; }
+  var p=detectarPlataforma(); var steps='';
+  if(p.isStandalone){ steps='<div class="alert ai"><i class="ti ti-check"></i><div>App já instalado!</div></div>'; }
+  else if(p.isIOS&&p.isSafari){ steps=instrStep('1','ti-share','Compartilhar','Botão na barra do Safari')+instrStep('2','ti-plus','Adicionar à Tela de Início','Role a lista de opções')+instrStep('3','ti-check','Confirme','Toque em Adicionar'); }
+  else if(p.isIOS){ steps='<div class="alert" style="background:var(--abg);color:var(--atx);border:0.5px solid #FAC775;margin-bottom:0"><i class="ti ti-info-circle"></i><div>Abra no <strong>Safari</strong> para instalar.</div></div>'; }
+  else if(p.isAndroid){ steps=instrStep('1','ti-dots-vertical','Menu do Chrome','Três pontos no canto superior')+instrStep('2','ti-download','Adicionar à tela inicial','ou "Instalar app"')+instrStep('3','ti-check','Confirme','App adicionado à tela inicial'); }
+  else { steps=instrStep('1','ti-layout-navbar','Barra de endereço','Ícone ⊕ na barra do Chrome/Edge')+instrStep('2','ti-download','Instalar Éllu Ambiental','Clique no ícone')+instrStep('3','ti-check','Confirme','App abrirá em janela própria'); }
+  document.getElementById('installInstructions').innerHTML=steps;
+  abrirSheet('shInstall');
+}
+function instrStep(n,i,t,d){ return '<div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:16px"><div style="width:32px;height:32px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+n+'</div><div><div style="font-size:14px;font-weight:600;margin-bottom:2px"><i class="ti '+i+'" style="margin-right:5px;color:var(--g)"></i>'+t+'</div><div style="font-size:12.5px;color:var(--tx2);line-height:1.5">'+d+'</div></div></div>'; }
+window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferredPrompt=e; });
+window.addEventListener('appinstalled',function(){ toast('✅ App instalado!'); deferredPrompt=null; });
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load',function(){
+
+  // Limpar service workers antigos para garantir HTML atualizado
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){ r.unregister(); });
+    });
+  }
+
+  function iniciarApp(){
+    var users=DB.get('usuarios')||[];
+    if(users.length===0){
+      DB.push('usuarios',{nome:'Administrador',email:'admin@lab.com',senha:'1234',perfis:['admin'],perfil:'admin',assinatura:null,criadoEm:new Date().toISOString()});
+    }
+    carregarLoginSelect();
+    iniciarSincronizacaoRealtime();
+    if('serviceWorker' in navigator){
+      var sw=["const C='amb-v9';","self.addEventListener('install',e=>{ e.waitUntil(caches.open(C).then(c=>c.add(location.href)).catch(()=>{})); self.skipWaiting(); });","self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))); self.clients.claim(); });","self.addEventListener('fetch',e=>{ if(e.request.method!=='GET') return; e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))); });"].join('\n');
+      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(function(){});
+    }
+  }
+
+  function esconderSplash(){
+    var s=document.getElementById('spl');
+    if(!s||s._removido) return;
+    s._removido=true;
+    s.style.opacity='0';
+    s.style.pointerEvents='none';
+    setTimeout(function(){
+      s.style.display='none';
+      if(s.parentNode) s.parentNode.removeChild(s);
+    },400);
+  }
+
+  // 1. Iniciar app IMEDIATAMENTE com dados locais
+  iniciarApp();
+
+  // 2. Esconder splash após 1.2s — nunca trava o app
+  setTimeout(esconderSplash, 1200);
+
+  // 3. Sincronizar Firestore em paralelo (silenciosamente)
+  sincronizarDoFirestore(function(){
+    esconderSplash();
+    carregarLoginSelect();
+  });
+});
+</script>
+</body>
+</html>
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
