@@ -1246,7 +1246,7 @@ function novoIns(){
 }
 function editarIns(idx){
   var ins=(DB.get('insumos')||[])[idx]; if(!ins) return;
-  sv('iIdx',idx);
+  document.getElementById('iIdx').value=idx;
   sv('iNome',ins.nome||''); sv('iTipo',ins.tipo||''); sv('iMat',ins.matriz||''); sv('iCrit',ins.critici||'');
   sv('iSpec',ins.spec||''); sv('iCod',ins.codigo||''); sv('iVal',ins.validade||''); sv('iValMin',ins.valMin||''); sv('iObs',ins.obs||'');
   var fornSel=document.getElementById('iFornSel');
@@ -1396,7 +1396,7 @@ function novoForn(){
 }
 function editarForn(idx){
   var f=(DB.get('fornecedores')||[])[idx]; if(!f) return;
-  sv('fIdx',idx);
+  document.getElementById('fIdx').value=idx;
   sv('fNome',f.nome||''); sv('fCnpj',f.cnpj||''); sv('fEspec',f.espec||''); sv('fMat',f.matriz||'');
   sv('fStat',f.status||'Em qualificação'); sv('fCont',f.contato||''); sv('fPer',f.period||'Anual'); sv('fObs',f.obs||'');
   document.getElementById('shFornTitulo').childNodes[0].textContent='Editar fornecedor';
