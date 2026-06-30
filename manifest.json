@@ -1,19 +1,32 @@
 {
-  "name": "Éllu Ambiental",
-  "short_name": "Éllu",
-  "description": "Gestão de laboratório ambiental ISO 17025",
-  "start_url": ".",
-  "scope": ".",
+  "name": "Éllu Ambiental — ISO 17025",
+  "short_name": "Éllu Ambiental",
+  "description": "Gestão de compras, insumos e fornecedores conforme ISO/IEC 17025:2017",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0F6E56",
   "theme_color": "#0F6E56",
-  "orientation": "portrait",
+  "lang": "pt-BR",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
