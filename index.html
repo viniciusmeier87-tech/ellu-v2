@@ -433,21 +433,24 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- SHEET: Avaliação Fornecedor -->
 <div class="sbg" id="bgAval" onclick="fecharSheet('shAval')">
 <div class="sh" id="shAval" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht">Avaliar fornecedor — §6.6.2<button class="shclose" onclick="fecharSheet('shAval')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Avaliação inicial — FO.008<button class="shclose" onclick="fecharSheet('shAval')">✕</button></div>
   <div class="shb">
     <div class="ib2" id="avalInfo">—</div>
     <input type="hidden" id="avalIdx">
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:13px">Critérios — nota de 1 a 5</div>
-    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>1. Qualidade e pureza dos insumos</span><span style="font-weight:700;color:var(--g)" id="sv0">—</span></div><div id="sb0"></div></div>
-    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>2. Conformidade documental (CoA)</span><span style="font-weight:700;color:var(--g)" id="sv1">—</span></div><div id="sb1"></div></div>
-    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>3. Cumprimento de prazos</span><span style="font-weight:700;color:var(--g)" id="sv2">—</span></div><div id="sb2"></div></div>
-    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>4. Tratamento de não conformidades</span><span style="font-weight:700;color:var(--g)" id="sv3">—</span></div><div id="sb3"></div></div>
-    <div class="cr" style="border-bottom:none"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>5. Capacidade técnica ambiental</span><span style="font-weight:700;color:var(--g)" id="sv4">—</span></div><div id="sb4"></div></div>
-    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Nota geral calculada</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
-    <div class="fg"><label class="fl">Decisão</label><select id="avalDec"><option>Aprovado</option><option>Aprovado com condições</option><option>Suspenso temporariamente</option><option>Descredenciado</option></select></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios FO.008 — nota de 0 a 10 (deixe vazio para NA)</div>
+    <div class="card" style="margin-bottom:13px">
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">1. Qualidade</div><input type="number" id="av0" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">2. Localização</div><input type="number" id="av1" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">3. Política de entrega</div><input type="number" id="av2" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">4. Preço</div><input type="number" id="av3" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">5. Prazo certificados</div><input type="number" id="av4" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">6. Assistência técnica</div><input type="number" id="av5" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">7. Garantia</div><input type="number" id="av6" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Avaliação Inicial</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
     <div class="fg"><label class="fl">Observações e evidências</label><textarea id="avalObs" placeholder="Evidências, NC relacionadas, melhorias..."></textarea></div>
     <div class="fg"><label class="fl">Próxima reavaliação</label><input type="date" id="avalProx"></div>
-    <button class="btn btp btf" onclick="salvarAval()"><i class="ti ti-star"></i>Salvar avaliação</button>
+    <button class="btn btp btf" onclick="salvarAval()"><i class="ti ti-star"></i>Salvar avaliação inicial</button>
   </div>
 </div></div>
 
@@ -591,37 +594,23 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- SHEET: Avaliação do Fornecedor por Pedido -->
 <div class="sbg" id="bgAvalFornPC" onclick="fecharSheet('shAvalFornPC')">
 <div class="sh" id="shAvalFornPC" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht">Avaliar fornecedor do pedido<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Avaliação por pedido — FO.061<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
   <div class="shb">
     <input type="hidden" id="avalFornPCIdx">
     <div class="ib2" id="avalFornPCInfo">—</div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Critérios de avaliação do fornecedor</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios FO.061 — nota de 0 a 10 (deixe vazio para NA)</div>
     <div class="card" style="margin-bottom:13px">
-      <div class="ci"><input type="checkbox" id="afpc1"><span style="font-size:13px">Entregou no prazo combinado</span></div>
-      <div class="ci"><input type="checkbox" id="afpc2"><span style="font-size:13px">Qualidade conforme especificação</span></div>
-      <div class="ci"><input type="checkbox" id="afpc3"><span style="font-size:13px">Documentação completa (CoA, NF, laudos)</span></div>
-      <div class="ci"><input type="checkbox" id="afpc4"><span style="font-size:13px">Quantidade e embalagem corretas</span></div>
-      <div class="ci"><input type="checkbox" id="afpc5"><span style="font-size:13px">Rastreabilidade / certificados presentes</span></div>
-      <div class="ci"><input type="checkbox" id="afpc6"><span style="font-size:13px">Atendimento e comunicação adequados</span></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">1. Prazo</div><input type="number" id="afpc0" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">2. Especificações</div><input type="number" id="afpc1" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">3. Quantidade</div><input type="number" id="afpc2" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">4. Qualidade</div><input type="number" id="afpc3" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">5. Validade</div><input type="number" id="afpc4" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">6. Documentação</div><input type="number" id="afpc5" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">7. Embalagem</div><input type="number" id="afpc6" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">8. Rotulagem</div><input type="number" id="afpc7" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ah"><div style="font-size:13px;margin-bottom:6px">9. Critérios de aceitação</div><input type="number" id="afpc8" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
     </div>
-    <div class="fg"><label class="fl">Nota geral (1–5)</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="avalFornPCStars">
-        <button class="sb3" onclick="setNotaFornPC(1)">1</button>
-        <button class="sb3" onclick="setNotaFornPC(2)">2</button>
-        <button class="sb3" onclick="setNotaFornPC(3)">3</button>
-        <button class="sb3" onclick="setNotaFornPC(4)">4</button>
-        <button class="sb3" onclick="setNotaFornPC(5)">5</button>
-        <span id="avalFornPCNotaTxt" style="font-size:13px;color:var(--tx2);align-self:center">—</span>
-      </div>
-    </div>
-    <div class="fg"><label class="fl">Resultado</label>
-      <select id="avalFornPCRes">
-        <option value="Aprovado">✅ Aprovado — manter</option>
-        <option value="Aprovado com condições">⚠️ Aprovado com condições</option>
-        <option value="Suspenso temporariamente">🔴 Suspenso temporariamente</option>
-        <option value="Descredenciado">❌ Descredenciado</option>
-      </select>
-    </div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Média deste pedido</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="avalFornPCNotaTxt">—</span></div>
     <div class="fg"><label class="fl">Observações</label><textarea id="avalFornPCObs" placeholder="Desvios, pontos de melhoria..."></textarea></div>
     <div class="fg"><label class="fl">Avaliador</label><select id="avalFornPCResp"><option value="">— Selecione —</option></select></div>
     <button class="btn btp btf" onclick="salvarAvalFornPC()"><i class="ti ti-check"></i>Registrar avaliação</button>
@@ -900,9 +889,9 @@ function statusBadge(s){
   return m[s]||'<span class="b bx">'+s+'</span>';
 }
 function fornStatus(s){
-  if(!s) return '<span class="b bx">—</span>';
+  if(!s) return '<span class="b bx">Em qualificação</span>';
   if(s==='Aprovado') return '<span class="b bg">Aprovado</span>';
-  if(s.startsWith('Suspenso')||s==='Descredenciado') return '<span class="b br">'+s.split(' ')[0]+'</span>';
+  if(s==='Reprovado'||s.startsWith('Suspenso')||s==='Descredenciado') return '<span class="b br">'+s.split(' ')[0]+'</span>';
   return '<span class="b ba">'+s.split(' ')[0]+'</span>';
 }
 function fmt(iso){ try{ return new Date(iso+'T12:00').toLocaleDateString('pt-BR'); }catch(e){ return iso||'—'; } }
@@ -921,7 +910,7 @@ function renderDash() {
   document.getElementById('mReq').textContent = aber;
   document.getElementById('mIns').textContent = ins.length;
   var fornAp   = forns.filter(function(f){ return f.status==='Aprovado'; }).length;
-  var fornQual = forns.filter(function(f){ return f.status&&f.status!=='Aprovado'&&!f.status.startsWith('Desc'); }).length;
+  var fornQual = forns.filter(function(f){ return f.status&&f.status!=='Aprovado'&&f.status!=='Reprovado'&&!f.status.startsWith('Desc'); }).length;
   document.getElementById('mFornAp').textContent   = fornAp;
   document.getElementById('msFornAp').textContent  = 'de '+forns.length+' cadastrados';
   document.getElementById('mFornQual').textContent = fornQual;
@@ -1050,7 +1039,7 @@ function verReqDetalhe(idx){
       +'</div></div>';
   } else if(r.status==='concluido'){
     var jaAvaliado = r.avaliacao ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-check"></i><div>Avaliado: <strong>'+r.avaliacao.resultado+'</strong></div></div>' : '';
-    var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado: <strong>'+r.avaliacaoForn.resultado+'</strong> · ⭐ '+r.avaliacaoForn.nota+'/5</div></div>' : '';
+    var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado (FO.061) — média <strong>'+r.avaliacaoForn.media+'/10</strong></div></div>' : '';
     aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
       +(!r.avaliacao?'<button class="btn btp btf" onclick="prepAvalPC('+idx+')"><i class="ti ti-star"></i>Avaliar pedido</button>':'')
       +jaAvaliado
@@ -1079,12 +1068,11 @@ function verReqDetalhe(idx){
       +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacao.criteriosOK+'/6</div></div>'
       +(r.avaliacao.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacao.obs+'</div></div>':'')
       +'</div>':'')
-    +(r.avaliacaoForn?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do fornecedor</div>'
+    +(r.avaliacaoForn?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do fornecedor — FO.061</div>'
       +'<div class="card" style="margin-bottom:11px">'
       +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor</div><div class="iv">'+(r.forn||'—')+'</div></div>'
-      +'<div class="ir" style="padding:10px 14px"><div class="ik">Resultado</div><div class="iv">'+r.avaliacaoForn.resultado+'</div></div>'
-      +'<div class="ir" style="padding:10px 14px"><div class="ik">Nota</div><div class="iv">⭐ '+r.avaliacaoForn.nota+'/5</div></div>'
-      +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacaoForn.criteriosOK+'/6</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Média do pedido</div><div class="iv">'+r.avaliacaoForn.media+'/10</div></div>'
+      +(r.avaliacaoForn.resp?'<div class="ir" style="padding:10px 14px"><div class="ik">Avaliador</div><div class="iv">'+r.avaliacaoForn.resp+'</div></div>':'')
       +(r.avaliacaoForn.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacaoForn.obs+'</div></div>':'')
       +'</div>':'')
     +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de movimentações</div>'
@@ -1435,12 +1423,13 @@ function renderForn(){
   empty.style.display='none';
   forns.forEach(function(f,idx){
     var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
-    var nota=f.nota?f.nota.toFixed(1):'—';
-    var nAv=f.avaliacoes?f.avaliacoes.length:0;
+    var nota=(f.mediaTotal!=null)?f.mediaTotal.toFixed(2):'—';
+    var reqs=DB.get('requisicoes')||[];
+    var nAv=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; }).length;
     var el=document.createElement('div'); el.className='li';
     el.innerHTML='<div class="lic" style="background:var(--gbg);color:var(--gtx);font-size:13px;font-weight:700">'+ini+'</div>'
       +'<div class="lib"><div class="lit">'+f.nome+'</div><div class="lis">'+(f.espec||f.matriz||'—')+'</div>'
-      +'<div style="margin-top:3px;font-size:10.5px;color:var(--tx3)">'+(nota!=='—'?'⭐ '+nota+'/5':'Sem avaliação')+' · '+nAv+' aval.</div></div>'
+      +'<div style="margin-top:3px;font-size:10.5px;color:var(--tx3)">'+(nota!=='—'?'Média total '+nota+'/10':'Sem avaliação')+' · '+nAv+' pedido'+(nAv!==1?'s':'')+' aval.</div></div>'
       +'<div class="lir">'+fornStatus(f.status)+'<i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px;margin-top:5px"></i></div>';
     (function(i){ el.onclick=function(){ verFornDetalhe(i); }; })(idx);
     lista.appendChild(el);
@@ -1453,35 +1442,41 @@ function verFornDetalhe(idx){
   document.getElementById('dFornT').textContent=f.nome;
   document.getElementById('dFornS').textContent=(f.espec||f.matriz||'—');
   var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
-  var nota=f.nota?f.nota.toFixed(1):'—';
-  var critNomes=['Qualidade dos insumos','Conformidade documental','Cumprimento de prazos','Tratamento de NC','Capacidade técnica'];
-  var ul=f.avaliacoes&&f.avaliacoes.length>0?f.avaliacoes[f.avaliacoes.length-1]:null;
-  var critHtml='';
-  if(ul&&ul.scores){
-    critHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Última avaliação — critérios</div>'
+  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia'];
+  var critIniHtml='';
+  if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
+    critIniHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">FO.008 — Avaliação inicial</div>'
       +'<div class="card" style="padding:12px 14px;margin-bottom:11px">';
-    critNomes.forEach(function(n,i){
-      var s=ul.scores[i]||0;
-      critHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/5</strong></div>'
-        +'<div class="pb"><div class="pbv" style="width:'+(s*20)+'%;'+(s<3?'background:#EF9F27':'')+'"></div></div></div>';
+    critNomesIni.forEach(function(n,i){
+      var s=f.avaliacaoInicial.scores[i];
+      if(s==null){ critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong style="color:var(--tx3)">NA</strong></div></div>'; return; }
+      critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/10</strong></div>'
+        +'<div class="pb"><div class="pbv" style="width:'+(s*10)+'%;'+(s<7?'background:#EF9F27':'')+'"></div></div></div>';
     });
-    critHtml+='</div>';
+    critIniHtml+='</div>';
   }
+  var reqs=DB.get('requisicoes')||[];
+  var avaliacoesPedidos=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; });
   var avalHtml='';
-  if(f.avaliacoes&&f.avaliacoes.length>0){
-    f.avaliacoes.slice().reverse().forEach(function(a){
-      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+a.decisao+'</div>'
-        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Nota '+a.nota+'/5</div>'
+  if(avaliacoesPedidos.length>0){
+    avaliacoesPedidos.slice().reverse().forEach(function(r){
+      var a=r.avaliacaoForn;
+      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+r.id+' — '+r.insumo+'</div>'
+        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Média '+a.media+'/10'+(a.resp?' · '+a.resp:'')+'</div>'
         +(a.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+a.obs+'</div>':'')+'</div>';
     });
   } else {
-    avalHtml='<div class="empty" style="padding:22px"><i class="ti ti-star"></i><div class="et" style="font-size:13px">Sem avaliações</div></div>';
+    avalHtml='<div class="empty" style="padding:22px"><i class="ti ti-star"></i><div class="et" style="font-size:13px">Sem avaliações de pedidos (FO.061)</div></div>';
   }
   document.getElementById('dFornB').innerHTML=
     '<div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:var(--rl);padding:12px;margin-bottom:12px">'
     +'<div style="width:46px;height:46px;background:var(--gbg);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gtx)">'+ini+'</div>'
-    +'<div><div style="font-size:15px;font-weight:700">'+f.nome+'</div>'+fornStatus(f.status)
-    +(nota!=='—'?'<div style="font-size:11px;color:var(--tx3);margin-top:3px">⭐ '+nota+'/5 · '+(f.avaliacoes?f.avaliacoes.length:0)+' avaliações</div>':'')+'</div></div>'
+    +'<div><div style="font-size:15px;font-weight:700">'+f.nome+'</div>'+fornStatus(f.status)+'</div></div>'
+    +'<div class="mets" style="margin-bottom:12px">'
+    +'<div class="met"><div class="ml">Avaliação Inicial (FO.008)</div><div class="mv">'+(f.mediaInicial!=null?f.mediaInicial:'—')+'</div><div class="ms">de 10</div></div>'
+    +'<div class="met"><div class="ml">Média Monitoramento (FO.061)</div><div class="mv">'+(f.mediaMonitoramento!=null?f.mediaMonitoramento:'—')+'</div><div class="ms">'+avaliacoesPedidos.length+' pedido'+(avaliacoesPedidos.length!==1?'s':'')+' avaliado'+(avaliacoesPedidos.length!==1?'s':'')+'</div></div>'
+    +'<div class="met" style="grid-column:1/-1"><div class="ml">Média Total</div><div class="mv" style="color:'+(f.mediaTotal!=null&&f.mediaTotal>=7?'var(--gtx)':f.mediaTotal!=null?'var(--rtx)':'inherit')+'">'+(f.mediaTotal!=null?f.mediaTotal:'—')+'</div><div class="ms">corte: ≥ 7 Aprovado · &lt; 7 Reprovado</div></div>'
+    +'</div>'
     +'<div class="card" style="margin-bottom:11px">'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">CNPJ</div><div class="iv">'+(f.cnpj||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Especialidade</div><div class="iv">'+(f.espec||'—')+'</div></div>'
@@ -1489,62 +1484,77 @@ function verFornDetalhe(idx){
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Contato</div><div class="iv">'+(f.contato||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Reavaliação</div><div class="iv">'+(f.period||'Anual')+'</div></div>'
     +'</div>'
-    +critHtml
-    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de avaliações</div>'
+    +critIniHtml
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">FO.061 — Avaliações por pedido</div>'
     +'<div class="card" style="margin-bottom:13px">'+avalHtml+'</div>'
     +'<div style="display:flex;gap:8px">'
-    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>Nova avaliação</button>'
+    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>'+(f.avaliacaoInicial?'Editar avaliação inicial':'Avaliação inicial (FO.008)')+'</button>'
     +'<button class="btn bto btf" onclick="editarForn('+idx+')"><i class="ti ti-edit"></i>Editar</button>'
     +'</div>';
   abrirDetalhe('dForn');
 }
 
-var aScores=[0,0,0,0,0];
 function prepAval(idx){
   document.getElementById('avalIdx').value=idx;
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
   document.getElementById('avalInfo').textContent=f.nome+(f.espec?' · '+f.espec:'');
-  aScores=[0,0,0,0,0];
-  for(var i=0;i<5;i++){
-    document.getElementById('sv'+i).textContent='—';
-    var box=document.getElementById('sb'+i); box.innerHTML='';
-    for(var v=1;v<=5;v++){
-      var b=document.createElement('button'); b.className='sb3'; b.textContent=v;
-      (function(ci,cv){ b.onclick=function(){ setAvalScore(ci,cv); }; })(i,v);
-      box.appendChild(b);
-    }
+  for(var i=0;i<7;i++){
+    var v=(f.avaliacaoInicial&&f.avaliacaoInicial.scores&&f.avaliacaoInicial.scores[i]!=null)?f.avaliacaoInicial.scores[i]:'';
+    sv('av'+i, v);
   }
-  sv('avalObs',''); sv('avalProx','');
-  document.getElementById('notaG').textContent='—';
+  sv('avalObs', f.avaliacaoInicial?f.avaliacaoInicial.obs:'');
+  sv('avalProx', f.avaliacaoInicial?f.avaliacaoInicial.proxima:'');
+  calcAvalIni();
   fecharDetalhe('dForn');
   abrirSheet('shAval');
 }
 
-function setAvalScore(ci,cv){
-  aScores[ci]=cv;
-  document.getElementById('sv'+ci).textContent=cv+'/5';
-  var btns=document.querySelectorAll('#sb'+ci+' .sb3');
-  for(var j=0;j<btns.length;j++) btns[j].classList.toggle('on',j+1===cv);
-  var vals=aScores.filter(function(v){ return v>0; });
-  if(vals.length>0){ document.getElementById('notaG').textContent=(vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1); }
+function calcAvalIni(){
+  var vals=[];
+  for(var i=0;i<7;i++){ var raw=gv('av'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
+  var el=document.getElementById('notaG');
+  if(vals.length===0){ el.textContent='—'; return null; }
+  var med=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+  el.textContent=med.toFixed(2);
+  return med;
 }
 
 function salvarAval(){
   var idx=parseInt(document.getElementById('avalIdx').value);
-  if(aScores.every(function(v){ return v===0; })){ toast('Atribua pelo menos uma nota'); return; }
+  var med=calcAvalIni();
+  if(med===null){ toast('Atribua pelo menos uma nota'); return; }
+  var scores=[]; for(var i=0;i<7;i++){ var raw=gv('av'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
-  var vals=aScores.filter(function(v){ return v>0; });
-  var med=parseFloat((vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1));
-  var aval={data:new Date().toISOString(),scores:aScores.slice(),nota:med,decisao:gv('avalDec'),obs:gv('avalObs'),proxima:gv('avalProx')};
-  if(!f.avaliacoes) f.avaliacoes=[];
-  f.avaliacoes.push(aval); f.nota=med; f.status=aval.decisao;
-  forns[idx]=f; DB.set('fornecedores',forns);
-  fecharSheet('shAval'); aScores=[0,0,0,0,0];
+  f.avaliacaoInicial={data:new Date().toISOString(),scores:scores,media:parseFloat(med.toFixed(2)),obs:gv('avalObs'),proxima:gv('avalProx')};
+  forns[idx]=f;
+  DB.set('fornecedores',forns);
+  recalcularFornecedor(idx);
   renderForn(); renderDash();
-  toast('Avaliação salva — nota '+med+'/5 ✓');
+  fecharSheet('shAval');
+  toast('Avaliação inicial salva — '+med.toFixed(2)+'/10 ✓');
   setTimeout(function(){ verFornDetalhe(idx); },300);
+}
+
+// Recalcula Média Monitoramento (FO.061) e Média Total do fornecedor, define status Aprovado/Reprovado (corte: 7)
+function recalcularFornecedor(idx){
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx]; if(!f) return;
+  var reqs=DB.get('requisicoes')||[];
+  var medias=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn && typeof r.avaliacaoForn.media==='number'; })
+                 .map(function(r){ return r.avaliacaoForn.media; });
+  var mediaMonitoramento = medias.length>0 ? medias.reduce(function(a,b){return a+b;},0)/medias.length : null;
+  var mediaInicial = (f.avaliacaoInicial&&typeof f.avaliacaoInicial.media==='number') ? f.avaliacaoInicial.media : null;
+  var partes=[]; if(mediaInicial!==null) partes.push(mediaInicial); if(mediaMonitoramento!==null) partes.push(mediaMonitoramento);
+  var mediaTotal = partes.length>0 ? partes.reduce(function(a,b){return a+b;},0)/partes.length : null;
+  f.mediaInicial = mediaInicial;
+  f.mediaMonitoramento = mediaMonitoramento!==null?parseFloat(mediaMonitoramento.toFixed(2)):null;
+  f.mediaTotal = mediaTotal!==null?parseFloat(mediaTotal.toFixed(2)):null;
+  f.nota = f.mediaTotal;
+  if(mediaTotal!==null){ f.status = mediaTotal>=7 ? 'Aprovado' : 'Reprovado'; }
+  forns[idx]=f;
+  DB.set('fornecedores',forns);
 }
 
 // ============================================================
@@ -1990,73 +2000,62 @@ function enviarEmail(idx){
 // ============================================================
 // AVALIAÇÃO DO FORNECEDOR POR PEDIDO
 // ============================================================
-var notaFornPC = 0;
 function prepAvalFornPC(idx){
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
   document.getElementById('avalFornPCIdx').value=idx;
   document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+' ('+r.insumo+')';
-  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); if(e) e.checked=false; });
-  notaFornPC=0;
-  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b){ b.classList.remove('on'); });
-  document.getElementById('avalFornPCNotaTxt').textContent='—';
-  sv('avalFornPCRes','Aprovado'); sv('avalFornPCObs','');
+  for(var i=0;i<9;i++){
+    var v=(r.avaliacaoForn&&r.avaliacaoForn.scores&&r.avaliacaoForn.scores[i]!=null)?r.avaliacaoForn.scores[i]:'';
+    sv('afpc'+i, v);
+  }
+  sv('avalFornPCObs', r.avaliacaoForn?r.avaliacaoForn.obs:'');
+  calcAvalFornPC();
   var selR=document.getElementById('avalFornPCResp');
   if(selR){
     var users=DB.get('usuarios')||[];
     selR.innerHTML='<option value="">— Selecione —</option>';
     users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
-    if(usuarioAtual) selR.value=usuarioAtual.nome;
+    selR.value = (r.avaliacaoForn&&r.avaliacaoForn.resp) ? r.avaliacaoForn.resp : (usuarioAtual?usuarioAtual.nome:'');
   }
   fecharDetalhe('dReq');
   abrirSheet('shAvalFornPC');
 }
 
-function setNotaFornPC(n){
-  notaFornPC=n;
-  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b,i){ b.classList.toggle('on',i<n); });
-  var labels=['','Insatisfatório','Ruim','Regular','Bom','Excelente'];
-  document.getElementById('avalFornPCNotaTxt').textContent=n+'/5 — '+labels[n];
+function calcAvalFornPC(){
+  var vals=[];
+  for(var i=0;i<9;i++){ var raw=gv('afpc'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
+  var el=document.getElementById('avalFornPCNotaTxt');
+  if(vals.length===0){ el.textContent='—'; return null; }
+  var med=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+  el.textContent=med.toFixed(2);
+  return med;
 }
 
 function salvarAvalFornPC(){
   var idx=parseInt(document.getElementById('avalFornPCIdx').value);
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
-  if(notaFornPC===0){ toast('Atribua uma nota ao fornecedor'); return; }
-  var cks=[]; var ok=0;
-  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); var v=e?e.checked:false; cks.push(v); if(v) ok++; });
+  var med=calcAvalFornPC();
+  if(med===null){ toast('Atribua pelo menos uma nota'); return; }
+  var scores=[]; for(var i=0;i<9;i++){ var raw=gv('afpc'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
   r.avaliacaoForn={
     forn:r.forn,
-    resultado:gv('avalFornPCRes'),
-    nota:notaFornPC,
-    criterios:cks,
-    criteriosOK:ok,
+    scores:scores,
+    media:parseFloat(med.toFixed(2)),
     obs:gv('avalFornPCObs'),
     resp:gv('avalFornPCResp'),
     data:new Date().toISOString()
   };
   reqs[idx]=r;
   DB.set('requisicoes',reqs);
-  // Registrar também no cadastro do fornecedor
+  // Recalcular médias e status do fornecedor (FO.008 + FO.061 -> Média Total, corte 7)
   var forns=DB.get('fornecedores')||[];
   var fi=forns.findIndex(function(f){ return f.nome===r.forn; });
-  if(fi>=0){
-    if(!forns[fi].avaliacoes) forns[fi].avaliacoes=[];
-    forns[fi].avaliacoes.push({
-      data:r.avaliacaoForn.data,
-      scores:[notaFornPC,notaFornPC,notaFornPC,notaFornPC,notaFornPC],
-      nota:notaFornPC,
-      decisao:gv('avalFornPCRes'),
-      obs:'Pedido '+r.id+' — '+(gv('avalFornPCObs')||''),
-      pedidoId:r.id
-    });
-    forns[fi].nota=notaFornPC;
-    forns[fi].status=gv('avalFornPCRes');
-    DB.set('fornecedores',forns);
-  }
+  if(fi>=0) recalcularFornecedor(fi);
   fecharSheet('shAvalFornPC');
-  toast('Fornecedor avaliado — nota '+notaFornPC+'/5 ✓');
+  renderForn();
+  toast('Avaliação do pedido salva — média '+med.toFixed(2)+'/10 ✓');
   setTimeout(function(){ verReqDetalhe(idx); },300);
 }
 function prepAvalPC(idx){
