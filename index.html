@@ -363,6 +363,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="shb">
     <div class="fg"><label class="fl">Selecionar do catálogo</label><select id="rCat" onchange="preencherReqDoCatalogo(this.value)"><option value="">— ou escolha um insumo cadastrado —</option></select></div>
     <div class="fg"><label class="fl">Insumo / descrição técnica</label><input type="text" id="rIns" placeholder="Nome do insumo"></div>
+    <div class="ci" style="padding:0 0 13px"><input type="checkbox" id="rContrato"><span style="font-size:13px">Pedido tipo <strong>contrato</strong> (itens enviados/recebidos aos poucos — ex.: calibração anual de equipamentos)</span></div>
     <div class="fg"><label class="fl">Tipo</label><select id="rTipo">
       <option>Insumos (consumíveis)</option>
       <option>Materiais de Referência (MR e MRC)</option>
@@ -635,6 +636,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="shdl"></div><div class="sht">Avaliação por pedido — FO.061<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
   <div class="shb">
     <input type="hidden" id="avalFornPCIdx">
+    <input type="hidden" id="avalFornPCItemIdx">
     <div class="ib2" id="avalFornPCInfo">—</div>
     <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios FO.061 — nota de 0 a 10 (deixe vazio para NA)</div>
     <div class="card" style="margin-bottom:13px">
@@ -1012,9 +1014,10 @@ function salvarReq() {
     var su=users[parseInt(solic)];
     if(su) solicNome=su.nome;
   }
-  DB.push('requisicoes',{id:id,insumo:ins,tipo:gv('rTipo'),matriz:gv('rMat'),critici:gv('rCrit'),spec:gv('rSpec'),qtd:gv('rQtd'),solic:solicNome,data:gv('rData'),just:gv('rJust'),forn:fornNome,fornEmail:fornEmail,status:'aprovacao',criadoEm:new Date().toISOString()});
+  var isContrato = document.getElementById('rContrato').checked;
+  DB.push('requisicoes',{id:id,insumo:ins,tipo:gv('rTipo'),matriz:gv('rMat'),critici:gv('rCrit'),spec:gv('rSpec'),qtd:gv('rQtd'),solic:solicNome,data:gv('rData'),just:gv('rJust'),forn:fornNome,fornEmail:fornEmail,status:'aprovacao',contrato:isContrato,itens:(isContrato?[]:undefined),criadoEm:new Date().toISOString()});
   fecharSheet('shReq');
-  clr(['rIns','rSpec','rQtd','rData','rJust']); sv('rCat',''); sv('rSolic',''); sv('rForn',''); sv('rFornEmail','');
+  clr(['rIns','rSpec','rQtd','rData','rJust']); sv('rCat',''); sv('rSolic',''); sv('rForn',''); sv('rFornEmail',''); document.getElementById('rContrato').checked=false;
   renderReqs(); renderDash();
   toast(id+' enviado para aprovação ✓');
 }
@@ -1075,21 +1078,26 @@ function verReqDetalhe(idx){
   var p = usuarioAtual?usuarioAtual.perfil:'';
   if(r.status==='aprovacao'&&(temPerfil(usuarioAtual,'admin')||temPerfil(usuarioAtual,'aprovador'))){
     aprovBtn='<button class="btn btp btf" style="margin-top:4px" onclick="prepAprov('+idx+')"><i class="ti ti-check"></i>Aprovar / Rejeitar</button>';
-  } else if(r.status==='compra'){
+  } else if(r.status==='compra'&&!r.contrato){
     aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
       +'<button class="btn btp btf" onclick="concluirReq('+idx+')"><i class="ti ti-package"></i>Marcar como concluída</button>'
       +'<div style="display:flex;gap:8px">'
       +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
       +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
       +'</div></div>';
+  } else if(r.status==='compra'&&r.contrato){
+    aprovBtn='<div style="display:flex;gap:8px;margin-top:4px">'
+      +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
+      +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
+      +'</div>';
   } else if(r.status==='concluido'){
     var jaAvaliado = r.avaliacao ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-check"></i><div>Avaliado: <strong>'+r.avaliacao.resultado+'</strong></div></div>' : '';
     var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado (FO.061) — média <strong>'+r.avaliacaoForn.media+'/10</strong></div></div>' : '';
     aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
       +(!r.avaliacao?'<button class="btn btp btf" onclick="prepAvalPC('+idx+')"><i class="ti ti-star"></i>Avaliar pedido</button>':'')
       +jaAvaliado
-      +(r.forn&&!r.avaliacaoForn?'<button class="btn bto btf" onclick="prepAvalFornPC('+idx+')"><i class="ti ti-building-store"></i>Avaliar fornecedor</button>':'')
-      +jaAvalForn
+      +(!r.contrato&&r.forn&&!r.avaliacaoForn?'<button class="btn bto btf" onclick="prepAvalFornPC('+idx+')"><i class="ti ti-building-store"></i>Avaliar fornecedor</button>':'')
+      +(!r.contrato?jaAvalForn:'')
       +'<div style="display:flex;gap:8px">'
       +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
       +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
@@ -1122,7 +1130,59 @@ function verReqDetalhe(idx){
       +'</div>':'')
     +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de movimentações</div>'
     +'<div class="card" style="margin-bottom:13px">'+histHtml+'</div>';
+  if(r.contrato&&(r.status==='compra'||r.status==='concluido')){
+    document.getElementById('dReqB').innerHTML = itensContratoHtml(r,idx) + document.getElementById('dReqB').innerHTML;
+  }
   abrirDetalhe('dReq');
+}
+
+function itensContratoHtml(r,idx){
+  var itens=r.itens||[];
+  var statusCor={'Aguardando envio':'var(--tx3)','Enviado':'var(--btx)','Recebido':'var(--gtx)'};
+  var statusClasse={'Aguardando envio':'bx','Enviado':'bb','Recebido':'bg'};
+  var itensHtml = itens.length>0
+    ? itens.map(function(it,i){
+        var acao='';
+        if(it.status==='Aguardando envio'){
+          acao='<button class="btn bto bts" onclick="marcarItemEnviado('+idx+','+i+')"><i class="ti ti-truck"></i>Marcar enviado</button>';
+        } else if(it.status==='Enviado'){
+          acao='<button class="btn btp bts" onclick="prepAvalFornPC('+idx+','+i+')"><i class="ti ti-package-import"></i>Registrar recepção e avaliar</button>';
+        } else if(it.status==='Recebido'&&it.avaliacaoForn){
+          acao='<span style="font-size:11px;color:var(--gtx)">Média '+it.avaliacaoForn.media+'/10</span>';
+        }
+        return '<div class="ah"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">'
+          +'<div style="font-size:13px;font-weight:500">'+it.nome+'</div>'
+          +'<span class="b '+(statusClasse[it.status]||'bx')+'">'+it.status+'</span></div>'
+          +'<div>'+acao+'</div></div>';
+      }).join('')
+    : '<div class="empty" style="padding:22px"><i class="ti ti-list"></i><div class="et" style="font-size:13px">Nenhum item adicionado ainda</div></div>';
+  return '<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Itens do contrato ('+itens.filter(function(it){return it.status==='Recebido';}).length+'/'+itens.length+' recebidos)</div>'
+    +'<div class="card" style="margin-bottom:11px">'+itensHtml+'</div>'
+    +'<button class="btn bto btf" style="margin-bottom:16px" onclick="adicionarItemContrato('+idx+')"><i class="ti ti-plus"></i>Adicionar equipamento/item</button>';
+}
+
+function adicionarItemContrato(idx){
+  var nome=window.prompt('Nome do equipamento/item a adicionar ao contrato:');
+  if(!nome||!nome.trim()) return;
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r) return;
+  if(!r.itens) r.itens=[];
+  r.itens.push({nome:nome.trim(),status:'Aguardando envio',dataEnvio:null,dataRetorno:null});
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  toast('Item adicionado ao contrato ✓');
+  verReqDetalhe(idx);
+}
+
+function marcarItemEnviado(idx,itemIdx){
+  var reqs=DB.get('requisicoes')||[];
+  var r=reqs[idx]; if(!r||!r.itens||!r.itens[itemIdx]) return;
+  r.itens[itemIdx].status='Enviado';
+  r.itens[itemIdx].dataEnvio=new Date().toISOString();
+  reqs[idx]=r;
+  DB.set('requisicoes',reqs);
+  toast('Item marcado como enviado ✓');
+  verReqDetalhe(idx);
 }
 
 function prepAprov(idx){
@@ -1623,12 +1683,21 @@ function verFornDetalhe(idx){
     critIniHtml+='</div>';
   }
   var reqs=DB.get('requisicoes')||[];
-  var avaliacoesPedidos=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; });
+  var avaliacoesPedidos=[];
+  reqs.forEach(function(r){
+    if(r.forn!==f.nome) return;
+    if(r.avaliacaoForn) avaliacoesPedidos.push({label:r.id+' — '+r.insumo, a:r.avaliacaoForn});
+    if(r.itens&&r.itens.length){
+      r.itens.forEach(function(it){
+        if(it.avaliacaoForn) avaliacoesPedidos.push({label:r.id+' — '+it.nome+' <span class="chip">contrato</span>', a:it.avaliacaoForn});
+      });
+    }
+  });
   var avalHtml='';
   if(avaliacoesPedidos.length>0){
-    avaliacoesPedidos.slice().reverse().forEach(function(r){
-      var a=r.avaliacaoForn;
-      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+r.id+' — '+r.insumo+'</div>'
+    avaliacoesPedidos.slice().reverse().forEach(function(item){
+      var a=item.a;
+      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+item.label+'</div>'
         +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Média '+a.media+'/10'+(a.resp?' · '+a.resp:'')+'</div>'
         +(a.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+a.obs+'</div>':'')+'</div>';
     });
@@ -1755,8 +1824,16 @@ function recalcularFornecedor(idx){
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx]; if(!f) return;
   var reqs=DB.get('requisicoes')||[];
-  var medias=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn && typeof r.avaliacaoForn.media==='number'; })
-                 .map(function(r){ return r.avaliacaoForn.media; });
+  var medias=[];
+  reqs.forEach(function(r){
+    if(r.forn!==f.nome) return;
+    if(r.avaliacaoForn&&typeof r.avaliacaoForn.media==='number') medias.push(r.avaliacaoForn.media);
+    if(r.itens&&r.itens.length){
+      r.itens.forEach(function(it){
+        if(it.avaliacaoForn&&typeof it.avaliacaoForn.media==='number') medias.push(it.avaliacaoForn.media);
+      });
+    }
+  });
   var mediaMonitoramento = medias.length>0 ? medias.reduce(function(a,b){return a+b;},0)/medias.length : null;
   var mediaInicial = (f.avaliacaoInicial&&typeof f.avaliacaoInicial.media==='number') ? f.avaliacaoInicial.media : null;
   var partes=[]; if(mediaInicial!==null) partes.push(mediaInicial); if(mediaMonitoramento!==null) partes.push(mediaMonitoramento);
@@ -2294,23 +2371,25 @@ function enviarEmail(idx){
 // ============================================================
 // AVALIAÇÃO DO FORNECEDOR POR PEDIDO
 // ============================================================
-function prepAvalFornPC(idx){
+function prepAvalFornPC(idx,itemIdx){
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
+  var target = (itemIdx!=null) ? r.itens[itemIdx] : r;
   document.getElementById('avalFornPCIdx').value=idx;
-  document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+' ('+r.insumo+')';
+  document.getElementById('avalFornPCItemIdx').value=(itemIdx!=null?itemIdx:'');
+  document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+(itemIdx!=null?' · item: '+r.itens[itemIdx].nome:' ('+r.insumo+')');
   for(var i=0;i<9;i++){
-    var v=(r.avaliacaoForn&&r.avaliacaoForn.scores&&r.avaliacaoForn.scores[i]!=null)?r.avaliacaoForn.scores[i]:'';
+    var v=(target.avaliacaoForn&&target.avaliacaoForn.scores&&target.avaliacaoForn.scores[i]!=null)?target.avaliacaoForn.scores[i]:'';
     sv('afpc'+i, v);
   }
-  sv('avalFornPCObs', r.avaliacaoForn?r.avaliacaoForn.obs:'');
+  sv('avalFornPCObs', target.avaliacaoForn?target.avaliacaoForn.obs:'');
   calcAvalFornPC();
   var selR=document.getElementById('avalFornPCResp');
   if(selR){
     var users=DB.get('usuarios')||[];
     selR.innerHTML='<option value="">— Selecione —</option>';
     users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
-    selR.value = (r.avaliacaoForn&&r.avaliacaoForn.resp) ? r.avaliacaoForn.resp : (usuarioAtual?usuarioAtual.nome:'');
+    selR.value = (target.avaliacaoForn&&target.avaliacaoForn.resp) ? target.avaliacaoForn.resp : (usuarioAtual?usuarioAtual.nome:'');
   }
   fecharDetalhe('dReq');
   abrirSheet('shAvalFornPC');
@@ -2328,12 +2407,14 @@ function calcAvalFornPC(){
 
 function salvarAvalFornPC(){
   var idx=parseInt(document.getElementById('avalFornPCIdx').value);
+  var itemIdxRaw=document.getElementById('avalFornPCItemIdx').value;
+  var itemIdx=itemIdxRaw!==''?parseInt(itemIdxRaw):null;
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
   var med=calcAvalFornPC();
   if(med===null){ toast('Atribua pelo menos uma nota'); return; }
   var scores=[]; for(var i=0;i<9;i++){ var raw=gv('afpc'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
-  r.avaliacaoForn={
+  var avaliacao={
     forn:r.forn,
     scores:scores,
     media:parseFloat(med.toFixed(2)),
@@ -2341,6 +2422,18 @@ function salvarAvalFornPC(){
     resp:gv('avalFornPCResp'),
     data:new Date().toISOString()
   };
+  if(itemIdx!=null){
+    r.itens[itemIdx].avaliacaoForn=avaliacao;
+    r.itens[itemIdx].status='Recebido';
+    r.itens[itemIdx].dataRetorno=new Date().toISOString();
+    if(r.itens.every(function(it){ return it.status==='Recebido'; })){
+      if(!r.historico) r.historico=[];
+      r.historico.push({acao:'Contrato concluído — todos os itens recebidos e avaliados',data:new Date().toISOString()});
+      r.status='concluido';
+    }
+  } else {
+    r.avaliacaoForn=avaliacao;
+  }
   reqs[idx]=r;
   DB.set('requisicoes',reqs);
   // Recalcular médias e status do fornecedor (FO.008 + FO.061 -> Média Total, corte 7)
@@ -2348,8 +2441,8 @@ function salvarAvalFornPC(){
   var fi=forns.findIndex(function(f){ return f.nome===r.forn; });
   if(fi>=0) recalcularFornecedor(fi);
   fecharSheet('shAvalFornPC');
-  renderForn();
-  toast('Avaliação do pedido salva — média '+med.toFixed(2)+'/10 ✓');
+  renderForn(); renderReqs();
+  toast('Avaliação salva — média '+med.toFixed(2)+'/10 ✓');
   setTimeout(function(){ verReqDetalhe(idx); },300);
 }
 function prepAvalPC(idx){
