@@ -1286,26 +1286,27 @@ function salvarIns(){
 }
 
 function renderIns(busca,mat){
-  var ins=DB.get('insumos')||[];
+  var insAll=DB.get('insumos')||[];
   var lista=document.getElementById('liIns');
   lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
   var empty=document.getElementById('eIns');
   var b=busca||document.getElementById('busInsInput').value||'';
   var m=mat!==undefined?mat:insFiltroMatriz;
-  var data=ins.slice().reverse().filter(function(i){
+  var data=insAll.slice().reverse().filter(function(i){
     if(m&&!(i.matriz&&i.matriz.toLowerCase().startsWith(m.toLowerCase()))) return false;
     if(b&&JSON.stringify(i).toLowerCase().indexOf(b.toLowerCase())<0) return false;
     return true;
   });
   empty.style.display=data.length===0?'':'none';
   data.forEach(function(ins){
+    var realIdx = insAll.indexOf(ins);
     var el=document.createElement('div'); el.className='li';
     var ic=MICON[ins.matriz]||'ti-flask';
     el.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+ic+'"></i></div>'
       +'<div class="lib"><div class="lit">'+(ins.nome||'—')+'</div><div class="lis">'+(ins.forn||'—')+'</div>'
       +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span></div></div>'
       +'<div class="lir"><i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i></div>';
-    (function(item){ el.onclick=function(){ verInsDetalhe(item); }; })(ins);
+    (function(item,idx){ el.onclick=function(){ verInsDetalhe(item,idx); }; })(ins,realIdx);
     lista.appendChild(el);
   });
 }
@@ -1317,7 +1318,7 @@ function filtroIns(m,btn){
   renderIns();
 }
 
-function verInsDetalhe(ins){
+function verInsDetalhe(ins,realIdx){
   document.getElementById('dInsT').textContent=ins.nome||'—';
   document.getElementById('dInsS').textContent=(ins.matriz||'—')+' · '+(ins.critici?ins.critici.split(' ')[0]:'—');
   var hoje2=new Date(); hoje2.setHours(0,0,0,0);
@@ -1342,16 +1343,10 @@ function verInsDetalhe(ins){
     +(ins.obs?'<div style="background:var(--bg2);border-radius:var(--r);padding:11px 12px;font-size:13px;color:var(--tx2);margin-bottom:12px">'+ins.obs+'</div>':'')
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn btp btf" onclick="reqDoInsumo(\''+encodeURIComponent(JSON.stringify(ins))+'\')"><i class="ti ti-send"></i>Requisitar</button>'
-    +'<button class="btn bto btf" onclick="editarIns('+findIdxIns(ins)+')"><i class="ti ti-edit"></i>Editar</button>'
+    +'<button class="btn bto btf" onclick="editarIns('+realIdx+')"><i class="ti ti-edit"></i>Editar</button>'
     +'</div>';
   abrirDetalhe('dIns');
 }
-function findIdxIns(ins){
-  var arr=DB.get('insumos')||[];
-  for(var i=0;i<arr.length;i++){ if(arr[i].criadoEm===ins.criadoEm) return i; }
-  return -1;
-}
-
 function reqDoInsumo(enc){
   var ins=JSON.parse(decodeURIComponent(enc));
   sv('rIns',ins.nome||'');
