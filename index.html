@@ -426,6 +426,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="fg"><label class="fl" id="fStatLabel">Status</label><input type="text" id="fStat" readonly style="background:var(--bg2)"></div>
     <div class="fg"><label class="fl">Contato / e-mail</label><input type="text" id="fCont" placeholder="contato@fornecedor.com.br"></div>
     <div class="fg"><label class="fl">Periodicidade de reavaliação</label><select id="fPer"><option>Anual</option><option>Semestral</option><option>A cada 2 anos</option></select></div>
+    <div class="fg">
+      <label class="fl">Critérios específicos de competência (conforme serviço/insumo)</label>
+      <div style="font-size:11.5px;color:var(--tx2);margin-bottom:7px">Marque apenas os critérios técnicos aplicáveis a este fornecedor — eles entrarão na avaliação inicial (FO.008) junto com os critérios gerais.</div>
+      <div class="card" id="fCritEspecBox" style="padding:4px 0"></div>
+    </div>
     <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
     <button class="btn btp btf" onclick="salvarForn()" id="btnSalvarForn"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
   </div>
@@ -447,6 +452,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="ah"><div style="font-size:13px;margin-bottom:6px">5. Prazo certificados</div><input type="number" id="av4" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
       <div class="ah"><div style="font-size:13px;margin-bottom:6px">6. Assistência técnica</div><input type="number" id="av5" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
       <div class="ah"><div style="font-size:13px;margin-bottom:6px">7. Garantia</div><input type="number" id="av6" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+      <div class="ah" style="border-bottom:none"><div style="font-size:13px;margin-bottom:6px">8. Atender especificações da Matriz de Competência</div><input type="number" id="av7" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
+    </div>
+    <div id="avalEspecBox" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios específicos deste fornecedor</div>
+      <div class="card" id="avalEspecCard" style="margin-bottom:13px"></div>
     </div>
     <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Avaliação Inicial</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
     <div class="fg"><label class="fl">Observações e evidências</label><textarea id="avalObs" placeholder="Evidências, NC relacionadas, melhorias..."></textarea></div>
@@ -1374,10 +1384,43 @@ function sincFornIns(idx){
   emailEl.value=opt.dataset.email||'';
 }
 
+// Critérios específicos de competência técnica (conforme planilha "BANCO DE DADOS AVALIAÇÃO")
+var CRITERIOS_ESPECIFICOS=[
+  'Qualificação térmica 0°C / 4°C / 6°C',
+  'Padrões de MRC de acordo com a ISO',
+  'Realizar calibração nas instalações da Éllu',
+  'Padrão de MR rastreado pela NIST',
+  'Calibração do termômetro capela nas faixas 10,00 / 20,00 / 30,00',
+  'Calibração do sensor de condutividade nas faixas 100 / 500 / 1048',
+  'Calibração do sensor de OD nas faixas 0,00 / 6,00 / 12,00',
+  'Calibração do sensor de ORP nas faixas 229 mV / 476 mV',
+  'Calibração do sensor de pH nas faixas 1,70 / 7,00 / 12,00',
+  'Calibração do termômetro nas faixas 0,0 / 15,0 / 30,00 / 45,00',
+  'Seguir critérios DOQ-CGCRE-033',
+  'Turbidímetro portátil, medição na faixa de 0 a 1000 NTU',
+  'Atender requisitos ISO 17034'
+];
+function renderFCritEspecBox(selecionados){
+  var box=document.getElementById('fCritEspecBox');
+  if(!box) return;
+  box.innerHTML='';
+  CRITERIOS_ESPECIFICOS.forEach(function(nome,i){
+    var div=document.createElement('div'); div.className='ci';
+    div.innerHTML='<input type="checkbox" id="fCrit'+i+'"'+(selecionados.indexOf(i)>=0?' checked':'')+'><span style="font-size:13px">'+nome+'</span>';
+    box.appendChild(div);
+  });
+}
+function getFCritEspecSelecionados(){
+  var sel=[];
+  CRITERIOS_ESPECIFICOS.forEach(function(_,i){ var e=document.getElementById('fCrit'+i); if(e&&e.checked) sel.push(i); });
+  return sel;
+}
+
 function novoForn(){
   sv('fIdx','-1');
   clr(['fNome','fCnpj','fEspec','fCont','fObs']);
   sv('fMat',''); sv('fStat','Em qualificação (sem avaliação ainda)'); sv('fPer','Anual');
+  renderFCritEspecBox([]);
   document.getElementById('shFornTitulo').childNodes[0].textContent='Novo fornecedor';
   document.getElementById('fStatLabel').textContent='Status';
   document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Cadastrar fornecedor';
@@ -1389,6 +1432,7 @@ function editarForn(idx){
   sv('fNome',f.nome||''); sv('fCnpj',f.cnpj||''); sv('fEspec',f.espec||''); sv('fMat',f.matriz||'');
   var statusTxt = f.status ? f.status+(f.mediaTotal!=null?' (média total '+f.mediaTotal+'/10)':'') : 'Em qualificação (sem avaliação ainda)';
   sv('fStat',statusTxt); sv('fCont',f.contato||''); sv('fPer',f.period||'Anual'); sv('fObs',f.obs||'');
+  renderFCritEspecBox(f.criteriosEspecificos||[]);
   document.getElementById('shFornTitulo').childNodes[0].textContent='Editar fornecedor';
   document.getElementById('fStatLabel').textContent='Status (automático — conforme avaliação)';
   document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Salvar alterações';
@@ -1399,16 +1443,18 @@ function salvarForn(){
   var nome=gv('fNome').trim();
   if(!nome){ toast('Preencha a razão social'); return; }
   var idx=parseInt(gv('fIdx'));
+  var criteriosEspecificos=getFCritEspecSelecionados();
   var forns=DB.get('fornecedores')||[];
   if(!isNaN(idx)&&idx>=0&&forns[idx]){
     var f=forns[idx];
     f.nome=nome; f.cnpj=gv('fCnpj'); f.espec=gv('fEspec'); f.matriz=gv('fMat');
-    f.contato=gv('fCont'); f.period=gv('fPer'); f.obs=gv('fObs');
+    f.contato=gv('fCont'); f.period=gv('fPer'); f.obs=gv('fObs'); f.criteriosEspecificos=criteriosEspecificos;
     forns[idx]=f;
     DB.set('fornecedores',forns);
+    recalcularFornecedor(idx);
     toast(nome+' atualizado ✓');
   } else {
-    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:null,contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,criadoEm:new Date().toISOString()});
+    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:null,contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),criteriosEspecificos:criteriosEspecificos,nota:0,criadoEm:new Date().toISOString()});
     toast(nome+' cadastrado ✓');
   }
   fecharSheet('shForn');
@@ -1444,7 +1490,7 @@ function verFornDetalhe(idx){
   document.getElementById('dFornT').textContent=f.nome;
   document.getElementById('dFornS').textContent=(f.espec||f.matriz||'—');
   var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
-  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia'];
+  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia','Atender especificações da Matriz de Competência'];
   var critIniHtml='';
   if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
     critIniHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">FO.008 — Avaliação inicial</div>'
@@ -1455,6 +1501,15 @@ function verFornDetalhe(idx){
       critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/10</strong></div>'
         +'<div class="pb"><div class="pbv" style="width:'+(s*10)+'%;'+(s<7?'background:#EF9F27':'')+'"></div></div></div>';
     });
+    if(f.avaliacaoInicial.scoresEspecificos&&(f.criteriosEspecificos||[]).length>0){
+      (f.criteriosEspecificos||[]).forEach(function(ci){
+        var s=f.avaliacaoInicial.scoresEspecificos[ci];
+        var n=CRITERIOS_ESPECIFICOS[ci];
+        if(s==null){ critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong style="color:var(--tx3)">NA</strong></div></div>'; return; }
+        critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/10</strong></div>'
+          +'<div class="pb"><div class="pbv" style="width:'+(s*10)+'%;'+(s<7?'background:#EF9F27':'')+'"></div></div></div>';
+      });
+    }
     critIniHtml+='</div>';
   }
   var reqs=DB.get('requisicoes')||[];
@@ -1501,9 +1556,25 @@ function prepAval(idx){
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
   document.getElementById('avalInfo').textContent=f.nome+(f.espec?' · '+f.espec:'');
-  for(var i=0;i<7;i++){
+  for(var i=0;i<8;i++){
     var v=(f.avaliacaoInicial&&f.avaliacaoInicial.scores&&f.avaliacaoInicial.scores[i]!=null)?f.avaliacaoInicial.scores[i]:'';
     sv('av'+i, v);
+  }
+  // Critérios específicos deste fornecedor
+  var especIdx=f.criteriosEspecificos||[];
+  var box=document.getElementById('avalEspecCard');
+  var boxWrap=document.getElementById('avalEspecBox');
+  box.innerHTML='';
+  if(especIdx.length>0){
+    boxWrap.style.display='';
+    especIdx.forEach(function(ci){
+      var prevVal=(f.avaliacaoInicial&&f.avaliacaoInicial.scoresEspecificos&&f.avaliacaoInicial.scoresEspecificos[ci]!=null)?f.avaliacaoInicial.scoresEspecificos[ci]:'';
+      var div=document.createElement('div'); div.className='ah';
+      div.innerHTML='<div style="font-size:13px;margin-bottom:6px">'+CRITERIOS_ESPECIFICOS[ci]+'</div><input type="number" id="avEsp'+ci+'" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" value="'+prevVal+'" oninput="calcAvalIni()">';
+      box.appendChild(div);
+    });
+  } else {
+    boxWrap.style.display='none';
   }
   sv('avalObs', f.avaliacaoInicial?f.avaliacaoInicial.obs:'');
   sv('avalProx', f.avaliacaoInicial?f.avaliacaoInicial.proxima:'');
@@ -1514,11 +1585,18 @@ function prepAval(idx){
 
 function calcAvalIni(){
   var vals=[];
-  for(var i=0;i<7;i++){ var raw=gv('av'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
-  var el=document.getElementById('notaG');
-  if(vals.length===0){ el.textContent='—'; return null; }
+  for(var i=0;i<8;i++){ var raw=gv('av'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
+  var idx=parseInt(document.getElementById('avalIdx').value);
+  var f=(DB.get('fornecedores')||[])[idx];
+  var especIdx=(f&&f.criteriosEspecificos)||[];
+  especIdx.forEach(function(ci){
+    var el=document.getElementById('avEsp'+ci); if(!el) return;
+    var raw=el.value.trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); }
+  });
+  var elG=document.getElementById('notaG');
+  if(vals.length===0){ elG.textContent='—'; return null; }
   var med=vals.reduce(function(a,b){return a+b;},0)/vals.length;
-  el.textContent=med.toFixed(2);
+  elG.textContent=med.toFixed(2);
   return med;
 }
 
@@ -1526,10 +1604,15 @@ function salvarAval(){
   var idx=parseInt(document.getElementById('avalIdx').value);
   var med=calcAvalIni();
   if(med===null){ toast('Atribua pelo menos uma nota'); return; }
-  var scores=[]; for(var i=0;i<7;i++){ var raw=gv('av'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
+  var scores=[]; for(var i=0;i<8;i++){ var raw=gv('av'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
-  f.avaliacaoInicial={data:new Date().toISOString(),scores:scores,media:parseFloat(med.toFixed(2)),obs:gv('avalObs'),proxima:gv('avalProx')};
+  var scoresEspecificos={};
+  (f.criteriosEspecificos||[]).forEach(function(ci){
+    var el=document.getElementById('avEsp'+ci); if(!el) return;
+    var raw=el.value.trim(); scoresEspecificos[ci]=raw===''?null:parseFloat(raw);
+  });
+  f.avaliacaoInicial={data:new Date().toISOString(),scores:scores,scoresEspecificos:scoresEspecificos,media:parseFloat(med.toFixed(2)),obs:gv('avalObs'),proxima:gv('avalProx')};
   forns[idx]=f;
   DB.set('fornecedores',forns);
   recalcularFornecedor(idx);
@@ -1917,7 +2000,7 @@ function gerarRelatorioFornecedores(){
   var forns=(DB.get('fornecedores')||[]).filter(function(f){ return f.status==='Aprovado'; });
   var reqs=DB.get('requisicoes')||[];
   var dataEmissao=new Date().toLocaleDateString('pt-BR');
-  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia'];
+  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia','Atender espec. Matriz de Competência'];
 
   var corpo='';
   if(forns.length===0){
@@ -1927,8 +2010,15 @@ function gerarRelatorioFornecedores(){
       var avals=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; });
       var iniHtml='<span style="color:#999">Sem avaliação inicial registrada</span>';
       if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
-        iniHtml='<table class="mini"><tr>'+critNomesIni.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr><tr>'
-          +f.avaliacaoInicial.scores.map(function(s){ return '<td>'+(s==null?'NA':s)+'</td>'; }).join('')+'</tr></table>';
+        var nomesCols=critNomesIni.slice();
+        var valoresCols=f.avaliacaoInicial.scores.slice();
+        (f.criteriosEspecificos||[]).forEach(function(ci){
+          nomesCols.push(CRITERIOS_ESPECIFICOS[ci]);
+          var sv=(f.avaliacaoInicial.scoresEspecificos&&f.avaliacaoInicial.scoresEspecificos[ci]!=null)?f.avaliacaoInicial.scoresEspecificos[ci]:null;
+          valoresCols.push(sv);
+        });
+        iniHtml='<table class="mini"><tr>'+nomesCols.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr><tr>'
+          +valoresCols.map(function(s){ return '<td>'+(s==null?'NA':s)+'</td>'; }).join('')+'</tr></table>';
       }
       var pedidosHtml='<p style="color:#999;font-size:11.5px;margin:4px 0">Nenhum pedido avaliado (FO.061)</p>';
       if(avals.length>0){
