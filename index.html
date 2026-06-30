@@ -2,23 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<script>
-// Matar todos os service workers imediatamente — antes de qualquer coisa
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(r){
-    r.forEach(function(sw){ sw.unregister(); });
-  });
-  // Limpar todos os caches
-  if('caches' in window){
-    caches.keys().then(function(names){
-      names.forEach(function(n){ caches.delete(n); });
-    });
-  }
-}
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -26,7 +9,7 @@ if('serviceWorker' in navigator){
 <meta name="apple-mobile-web-app-title" content="Éllu Ambiental">
 <meta name="theme-color" content="#0F6E56">
 <title>Éllu Ambiental — ISO 17025</title>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <!-- Firebase -->
@@ -173,8 +156,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .es{font-size:12.5px;line-height:1.5}
 .toast{position:fixed;bottom:calc(78px + var(--sb));left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;z-index:999;white-space:nowrap;pointer-events:none}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.splash{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;z-index:9999;transition:opacity .35s}
-.splash.hid{opacity:0;pointer-events:none;display:none}
+.splash{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;z-index:999;transition:opacity .4s}
+.splash.hid{opacity:0;pointer-events:none}
 .pb{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:4px}
 .pbv{height:100%;border-radius:99px;background:var(--g)}
 .trow{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
@@ -192,7 +175,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .ah:last-child{border-bottom:none}
 .chip{display:inline-flex;font-size:10.5px;padding:2px 7px;border-radius:6px;font-weight:500;background:var(--xbg);color:var(--xtx)}
 /* Login */
-.login-wrap{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:9999}
+.login-wrap{position:fixed;inset:0;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:998}
 .login-wrap.hid{display:none}
 .login-box{background:var(--bg);border-radius:18px;padding:24px;width:100%;max-width:360px}
 .login-logo{text-align:center;margin-bottom:20px}
@@ -208,7 +191,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 </head>
 <body>
 
-<!-- SPLASH REMOVIDO -->
+<!-- SPLASH -->
+<div class="splash" id="spl">
+  <div style="font-size:56px">🌿</div>
+  <div style="font-size:20px;font-weight:700;color:#fff">Éllu Ambiental</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.7)">ISO/IEC 17025:2017</div>
+</div>
 
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
@@ -679,33 +667,24 @@ var DB = {
 
 // Sincronizar dados do Firestore para o localStorage
 function sincronizarDoFirestore(callback){
-  var chamado = false;
-  function chamarUmaVez(){
-    if(!chamado){ chamado=true; callback&&callback(); }
-  }
-
-  // Timeout de segurança: se o Firestore demorar >5s, inicia o app mesmo assim
-  var tmo = setTimeout(function(){
-    console.warn('Firestore timeout — iniciando com dados locais');
-    chamarUmaVez();
-  }, 5000);
-
   var colecoes=['requisicoes','insumos','fornecedores','ncs','verificacoes','usuarios'];
   var pendentes=colecoes.length;
+  var algumErro=false;
   colecoes.forEach(function(col){
     db.collection('ellu').doc(col).get().then(function(doc){
-      if(doc.exists && doc.data() && doc.data().dados){
+      if(doc.exists && doc.data().dados){
         try{
           var dados=JSON.parse(doc.data().dados);
           localStorage.setItem(col,JSON.stringify(dados));
         }catch(e){}
       }
       pendentes--;
-      if(pendentes===0){ clearTimeout(tmo); chamarUmaVez(); }
+      if(pendentes===0) callback&&callback();
     }).catch(function(e){
       console.warn('Firestore get error:', col, e);
       pendentes--;
-      if(pendentes===0){ clearTimeout(tmo); chamarUmaVez(); }
+      algumErro=true;
+      if(pendentes===0) callback&&callback();
     });
   });
 }
@@ -2207,23 +2186,35 @@ window.addEventListener('appinstalled',function(){ toast('✅ App instalado!'); 
 // ============================================================
 // INIT
 // ============================================================
-// Executar IMEDIATAMENTE, sem esperar load
-(function(){
-  var users = DB.get('usuarios')||[];
-  if(users.length === 0){
-    DB.push('usuarios',{nome:'Administrador',email:'admin@lab.com',senha:'1234',perfis:['admin'],perfil:'admin',assinatura:null,criadoEm:new Date().toISOString()});
-  }
-  // Preencher select assim que DOM estiver pronto
-  document.addEventListener('DOMContentLoaded', function(){
+window.addEventListener('load',function(){
+  // Mostrar splash enquanto sincroniza
+  sincronizarDoFirestore(function(){
+    // Após sincronizar, esconder splash e iniciar app
+    setTimeout(function(){
+      var s=document.getElementById('spl');
+      s.classList.add('hid');
+      setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },400);
+    },400);
+
+    // Criar usuário admin padrão se não houver nenhum
+    var users=DB.get('usuarios')||[];
+    if(users.length===0){
+      DB.push('usuarios',{nome:'Administrador',email:'admin@lab.com',senha:'1234',perfis:['admin'],perfil:'admin',assinatura:null,criadoEm:new Date().toISOString()});
+    }
+
     carregarLoginSelect();
     iniciarSincronizacaoRealtime();
 
-    // Registrar Service Worker para PWA
     if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('/ellu-v2/sw.js').catch(function(){});
+      var sw=["const C='amb-v7';","self.addEventListener('install',e=>{ e.waitUntil(caches.open(C).then(c=>c.add(location.href)).catch(()=>{})); self.skipWaiting(); });","self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))); self.clients.claim(); });","self.addEventListener('fetch',e=>{ if(e.request.method!=='GET') return; e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))); });"].join('\n');
+      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(function(){});
+    }
+
+    if(!localStorage.getItem('installShown')){
+      localStorage.setItem('installShown','1');
     }
   });
-})();
+});
 </script>
 </body>
 </html>
