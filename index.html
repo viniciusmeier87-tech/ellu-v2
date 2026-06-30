@@ -240,6 +240,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="met"><div class="ml">Fornecedores aprovados</div><div class="mv" id="mFornAp">0</div><div class="ms" id="msFornAp">de 0 cadastrados</div></div>
     <div class="met"><div class="ml">Em qualificação</div><div class="mv" id="mFornQual">0</div><div class="ms" id="msFornQual">fornecedores</div></div>
     <div class="met" id="metVenc"><div class="ml">Vencendo em 30 dias</div><div class="mv" id="mVenc">0</div><div class="ms" id="msVenc">insumos</div></div>
+    <div class="met" id="metEstBaixo"><div class="ml">Estoque baixo</div><div class="mv" id="mEstBaixo">0</div><div class="ms" id="msEstBaixo">insumos</div></div>
   </div>
   <div class="alert ai"><i class="ti ti-info-circle"></i><div>Cadastre insumos, qualifique fornecedores e crie pedidos conforme ISO 17025 §6.6.</div></div>
   <div class="card"><div class="ch"><span class="ct">Últimos pedidos de compra</span></div><div id="dashReqs"><div class="empty"><i class="ti ti-file-text"></i><div class="et">Nenhum pedido</div><div class="es">Crie na aba Compras</div></div></div></div>
@@ -408,6 +409,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
     <div class="fg"><label class="fl">Validade mínima exigida (meses)</label><input type="number" id="iVal" placeholder="Ex.: 12" min="1"></div>
     <div class="fg"><label class="fl">Data de validade do lote atual</label><input type="date" id="iValMin"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 9px">Controle de estoque</div>
+    <div class="fg"><label class="fl">Unidade de medida</label><input type="text" id="iUnidade" placeholder="Ex.: frasco, litro, caixa, unidade"></div>
+    <div class="fg"><label class="fl" id="iEstAtualLabel">Estoque atual (inicial)</label><input type="number" id="iEstAtual" placeholder="0" min="0" step="0.01"></div>
+    <div class="fg"><label class="fl">Estoque mínimo (ponto de pedido)</label><input type="number" id="iEstMin" placeholder="0" min="0" step="0.01"></div>
     <div class="fg"><label class="fl">Observações / requisitos especiais</label><textarea id="iObs" placeholder="Armazenamento, transporte, certificados exigidos..."></textarea></div>
     <button class="btn btp btf" onclick="salvarIns()" id="btnSalvarIns"><i class="ti ti-check"></i>Cadastrar insumo</button>
   </div>
@@ -433,6 +438,28 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
     <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
     <button class="btn btp btf" onclick="salvarForn()" id="btnSalvarForn"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
+  </div>
+</div></div>
+
+<!-- SHEET: Movimentação de Estoque -->
+<div class="sbg" id="bgEstoque" onclick="fecharSheet('shEstoque')">
+<div class="sh" id="shEstoque" onclick="event.stopPropagation()">
+  <div class="shdl"></div><div class="sht" id="shEstoqueTitulo">Movimentação de estoque<button class="shclose" onclick="fecharSheet('shEstoque')">✕</button></div>
+  <div class="shb">
+    <input type="hidden" id="estIdx">
+    <input type="hidden" id="estTipo">
+    <div class="ib2" id="estInfo">—</div>
+    <div class="fg"><label class="fl">Quantidade</label><input type="number" id="estQtd" min="0.01" step="0.01" placeholder="0"></div>
+    <div class="fg"><label class="fl">Motivo</label><select id="estMotivo">
+      <option>Recebimento de pedido</option>
+      <option>Consumo em ensaio</option>
+      <option>Ajuste de inventário</option>
+      <option>Descarte / vencimento</option>
+      <option>Outro</option>
+    </select></div>
+    <div class="fg"><label class="fl">Responsável</label><select id="estResp"><option value="">— Selecione —</option></select></div>
+    <div class="fg"><label class="fl">Observações</label><textarea id="estObs" placeholder="Detalhes da movimentação..."></textarea></div>
+    <button class="btn btp btf" id="btnSalvarEst" onclick="salvarMovEstoque()"><i class="ti ti-check"></i>Registrar</button>
   </div>
 </div></div>
 
@@ -935,6 +962,13 @@ function renderDash() {
   metVenc.style.borderColor = venc>0?'#EF9F27':'';
   metVenc.style.background  = venc>0?'var(--abg)':'';
   document.getElementById('mVenc').style.color = venc>0?'var(--atx)':'';
+  var estBaixo = ins.filter(function(i){ return i.estoqueAtual!=null && (i.estoqueAtual<=0 || (i.estoqueMinimo>0 && i.estoqueAtual<=i.estoqueMinimo)); }).length;
+  document.getElementById('mEstBaixo').textContent = estBaixo;
+  document.getElementById('msEstBaixo').textContent = estBaixo===0?'tudo OK':'insumo'+(estBaixo===1?'':'s')+' em alerta';
+  var metEst = document.getElementById('metEstBaixo');
+  metEst.style.borderColor = estBaixo>0?'#791F1F':'';
+  metEst.style.background  = estBaixo>0?'var(--rbg)':'';
+  document.getElementById('mEstBaixo').style.color = estBaixo>0?'var(--rtx)':'';
   document.getElementById('msReq').textContent  = aber===0?'nenhum': reqs.filter(function(r){return r.status==='aprovacao';}).length+' aguard. aprov.';
   document.getElementById('msIns').textContent  = ins.length===0?'catálogo vazio': ins.filter(function(i){return i.critici&&i.critici.startsWith('Alta');}).length+' críticos';
   var box = document.getElementById('dashReqs');
@@ -1238,6 +1272,8 @@ function novoIns(){
   sv('iIdx','-1');
   clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail','');
   sv('iTipo','Insumos (consumíveis)'); sv('iMat',''); sv('iCrit','Alta — afeta diretamente o resultado');
+  sv('iUnidade',''); sv('iEstAtual','0'); sv('iEstMin','0');
+  document.getElementById('iEstAtualLabel').textContent='Estoque atual (inicial)';
   var fornSel=document.getElementById('iFornSel'); if(fornSel) fornSel.selectedIndex=0;
   document.getElementById('shInsTitulo').childNodes[0].textContent='Cadastrar insumo crítico';
   document.getElementById('btnSalvarIns').innerHTML='<i class="ti ti-check"></i>Cadastrar insumo';
@@ -1248,6 +1284,8 @@ function editarIns(idx){
   document.getElementById('iIdx').value=idx;
   sv('iNome',ins.nome||''); sv('iTipo',ins.tipo||''); sv('iMat',ins.matriz||''); sv('iCrit',ins.critici||'');
   sv('iSpec',ins.spec||''); sv('iCod',ins.codigo||''); sv('iVal',ins.validade||''); sv('iValMin',ins.valMin||''); sv('iObs',ins.obs||'');
+  sv('iUnidade',ins.unidade||''); sv('iEstAtual',(ins.estoqueAtual!=null?ins.estoqueAtual:0)); sv('iEstMin',(ins.estoqueMinimo!=null?ins.estoqueMinimo:0));
+  document.getElementById('iEstAtualLabel').textContent='Estoque atual (ajuste manual)';
   var fornSel=document.getElementById('iFornSel');
   if(fornSel){
     var opIdx=0;
@@ -1267,24 +1305,36 @@ function salvarIns(){
   var fornSel=document.getElementById('iFornSel');
   var fornNome=fornSel&&fornSel.selectedIndex>0?fornSel.options[fornSel.selectedIndex].text:'';
   var fornEmail=gv('iFornEmail');
-  var dados={nome:nome,tipo:gv('iTipo'),matriz:gv('iMat'),critici:gv('iCrit'),spec:gv('iSpec'),forn:fornNome,fornEmail:fornEmail,codigo:gv('iCod'),validade:gv('iVal'),valMin:gv('iValMin'),obs:gv('iObs')};
+  var estAtual=parseFloat(gv('iEstAtual')); if(isNaN(estAtual)) estAtual=0;
+  var estMin=parseFloat(gv('iEstMin')); if(isNaN(estMin)) estMin=0;
+  var dados={nome:nome,tipo:gv('iTipo'),matriz:gv('iMat'),critici:gv('iCrit'),spec:gv('iSpec'),forn:fornNome,fornEmail:fornEmail,codigo:gv('iCod'),validade:gv('iVal'),valMin:gv('iValMin'),obs:gv('iObs'),unidade:gv('iUnidade'),estoqueAtual:estAtual,estoqueMinimo:estMin};
   var ins=DB.get('insumos')||[];
   if(!isNaN(idx)&&idx>=0&&ins[idx]){
     dados.criadoEm=ins[idx].criadoEm;
+    dados.movimentos=ins[idx].movimentos||[];
     ins[idx]=dados;
     DB.set('insumos',ins);
     toast('"'+nome+'" atualizado ✓');
   } else {
     dados.criadoEm=new Date().toISOString();
+    dados.movimentos=[];
     DB.push('insumos',dados);
     toast('"'+nome+'" cadastrado ✓');
   }
   fecharSheet('shIns');
-  clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail',''); sv('iIdx','-1');
+  clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail',''); sv('iIdx','-1'); sv('iUnidade',''); sv('iEstAtual','0'); sv('iEstMin','0');
   if(fornSel) fornSel.selectedIndex=0;
   renderIns(); atualizarCatalogSelect(); renderDash();
 }
 
+function estoqueStatusInfo(ins){
+  var atual=ins.estoqueAtual!=null?ins.estoqueAtual:null;
+  var min=ins.estoqueMinimo!=null?ins.estoqueMinimo:0;
+  if(atual==null) return {label:'—',cor:'var(--tx3)',critico:false};
+  if(atual<=0) return {label:'Esgotado',cor:'var(--rtx)',critico:true};
+  if(min>0&&atual<=min) return {label:'Baixo',cor:'#EF9F27',critico:true};
+  return {label:'OK',cor:'var(--gtx)',critico:false};
+}
 function renderIns(busca,mat){
   var insAll=DB.get('insumos')||[];
   var lista=document.getElementById('liIns');
@@ -1302,9 +1352,11 @@ function renderIns(busca,mat){
     var realIdx = insAll.indexOf(ins);
     var el=document.createElement('div'); el.className='li';
     var ic=MICON[ins.matriz]||'ti-flask';
+    var est=estoqueStatusInfo(ins);
+    var estTxt=(ins.estoqueAtual!=null)?('<span style="font-size:10.5px;font-weight:700;color:'+est.cor+'">'+ins.estoqueAtual+(ins.unidade?' '+ins.unidade:'')+' · '+est.label+'</span>'):'';
     el.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+ic+'"></i></div>'
       +'<div class="lib"><div class="lit">'+(ins.nome||'—')+'</div><div class="lis">'+(ins.forn||'—')+'</div>'
-      +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span></div></div>'
+      +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span>'+estTxt+'</div></div>'
       +'<div class="lir"><i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i></div>';
     (function(item,idx){ el.onclick=function(){ verInsDetalhe(item,idx); }; })(ins,realIdx);
     lista.appendChild(el);
@@ -1329,8 +1381,27 @@ function verInsDetalhe(ins,realIdx){
     var vencendo=dv<=lim30b; var vencido=dv<hoje2;
     valMinHtml='<span style="color:'+(vencido?'var(--rtx)':vencendo?'#EF9F27':'inherit')+'">'+fmt(ins.valMin)+(vencido?' ⚠ Vencido':vencendo?' ⚠ Vencendo':'')+'</span>';
   }
+  var est=estoqueStatusInfo(ins);
+  var movs=ins.movimentos||[];
+  var movHtml=movs.length>0
+    ? movs.slice().reverse().slice(0,15).map(function(m){
+        var sinal=m.tipo==='entrada'?'+':'−';
+        var cor=m.tipo==='entrada'?'var(--gtx)':'var(--rtx)';
+        return '<div class="ah"><div style="display:flex;justify-content:space-between"><div style="font-size:13px;font-weight:500">'+m.motivo+'</div><strong style="color:'+cor+'">'+sinal+m.qtd+(ins.unidade?' '+ins.unidade:'')+'</strong></div>'
+          +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(m.data).toLocaleDateString('pt-BR')+(m.resp?' · '+m.resp:'')+'</div>'
+          +(m.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+m.obs+'</div>':'')+'</div>';
+      }).join('')
+    : '<div class="empty" style="padding:22px"><i class="ti ti-arrows-exchange"></i><div class="et" style="font-size:13px">Sem movimentações</div></div>';
   document.getElementById('dInsB').innerHTML=
     '<div class="trow" style="margin-bottom:13px">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—')+'</span></div>'
+    +'<div class="mets" style="margin-bottom:11px">'
+    +'<div class="met"><div class="ml">Estoque atual</div><div class="mv" style="color:'+est.cor+'">'+(ins.estoqueAtual!=null?ins.estoqueAtual:'—')+'</div><div class="ms">'+(ins.unidade||'')+' · '+est.label+'</div></div>'
+    +'<div class="met"><div class="ml">Estoque mínimo</div><div class="mv">'+(ins.estoqueMinimo!=null?ins.estoqueMinimo:'—')+'</div><div class="ms">ponto de pedido</div></div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:13px">'
+    +'<button class="btn btp btf" onclick="abrirMovEstoque('+realIdx+',\'entrada\')"><i class="ti ti-arrow-down"></i>Entrada</button>'
+    +'<button class="btn btd btf" onclick="abrirMovEstoque('+realIdx+',\'saida\')"><i class="ti ti-arrow-up"></i>Saída</button>'
+    +'</div>'
     +'<div class="card" style="margin-bottom:11px">'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Especificação</div><div class="iv" style="font-size:12px">'+(ins.spec||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor pref.</div><div class="iv">'+(ins.forn||'—')+'</div></div>'
@@ -1341,12 +1412,56 @@ function verInsDetalhe(ins,realIdx){
     +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Cadastrado em</div><div class="iv">'+new Date(ins.criadoEm).toLocaleDateString('pt-BR')+'</div></div>'
     +'</div>'
     +(ins.obs?'<div style="background:var(--bg2);border-radius:var(--r);padding:11px 12px;font-size:13px;color:var(--tx2);margin-bottom:12px">'+ins.obs+'</div>':'')
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Movimentações de estoque</div>'
+    +'<div class="card" style="margin-bottom:13px">'+movHtml+'</div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn btp btf" onclick="reqDoInsumo(\''+encodeURIComponent(JSON.stringify(ins))+'\')"><i class="ti ti-send"></i>Requisitar</button>'
     +'<button class="btn bto btf" onclick="editarIns('+realIdx+')"><i class="ti ti-edit"></i>Editar</button>'
     +'</div>';
   abrirDetalhe('dIns');
 }
+
+function abrirMovEstoque(idx,tipo){
+  var ins=(DB.get('insumos')||[])[idx]; if(!ins) return;
+  sv('estIdx',idx); sv('estTipo',tipo);
+  document.getElementById('shEstoqueTitulo').childNodes[0].textContent=(tipo==='entrada'?'Registrar entrada':'Registrar saída')+' — estoque';
+  document.getElementById('estInfo').textContent=ins.nome+' · estoque atual: '+(ins.estoqueAtual!=null?ins.estoqueAtual:0)+(ins.unidade?' '+ins.unidade:'');
+  sv('estQtd',''); sv('estMotivo',tipo==='entrada'?'Recebimento de pedido':'Consumo em ensaio'); sv('estObs','');
+  var selR=document.getElementById('estResp');
+  if(selR){
+    var users=DB.get('usuarios')||[];
+    selR.innerHTML='<option value="">— Selecione —</option>';
+    users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
+    if(usuarioAtual) selR.value=usuarioAtual.nome;
+  }
+  document.getElementById('btnSalvarEst').innerHTML='<i class="ti ti-check"></i>Registrar '+(tipo==='entrada'?'entrada':'saída');
+  fecharDetalhe('dIns');
+  abrirSheet('shEstoque');
+}
+
+function salvarMovEstoque(){
+  var idx=parseInt(gv('estIdx'));
+  var tipo=gv('estTipo');
+  var qtd=parseFloat(gv('estQtd'));
+  if(isNaN(qtd)||qtd<=0){ toast('Informe uma quantidade válida'); return; }
+  var ins=DB.get('insumos')||[];
+  var item=ins[idx]; if(!item) return;
+  var atual=item.estoqueAtual!=null?item.estoqueAtual:0;
+  if(tipo==='saida'&&qtd>atual){
+    toast('Quantidade maior que o estoque disponível ('+atual+(item.unidade?' '+item.unidade:'')+')');
+    return;
+  }
+  item.estoqueAtual = tipo==='entrada' ? parseFloat((atual+qtd).toFixed(3)) : parseFloat((atual-qtd).toFixed(3));
+  if(!item.movimentos) item.movimentos=[];
+  item.movimentos.push({tipo:tipo,qtd:qtd,motivo:gv('estMotivo'),resp:gv('estResp'),obs:gv('estObs'),data:new Date().toISOString()});
+  ins[idx]=item;
+  DB.set('insumos',ins);
+  fecharSheet('shEstoque');
+  renderIns(); renderDash();
+  toast((tipo==='entrada'?'Entrada':'Saída')+' registrada — novo estoque: '+item.estoqueAtual+(item.unidade?' '+item.unidade:''));
+  setTimeout(function(){ verInsDetalhe(item,idx); },300);
+}
+
 function reqDoInsumo(enc){
   var ins=JSON.parse(decodeURIComponent(enc));
   sv('rIns',ins.nome||'');
