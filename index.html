@@ -279,6 +279,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <div class="pg" id="pg-forn">
   <div style="padding-top:12px"></div>
   <div class="alert ai"><i class="ti ti-info-circle"></i><div>Apenas fornecedores <strong>Aprovados</strong> podem ser usados em pedidos — ISO 17025 §6.6.2.</div></div>
+  <button class="btn bto btf" style="margin-bottom:10px" onclick="gerarRelatorioFornecedores()"><i class="ti ti-file-type-pdf"></i>Relatório de fornecedores aprovados</button>
   <div class="card" id="liForn"><div class="empty" id="eForn"><i class="ti ti-building-store"></i><div class="et">Nenhum fornecedor</div><div class="es">Toque + para cadastrar</div></div></div>
   <button class="fab" onclick="novoForn()"><i class="ti ti-plus"></i></button>
 </div>
@@ -422,7 +423,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="fg"><label class="fl">CNPJ</label><input type="text" id="fCnpj" placeholder="00.000.000/0001-00"></div>
     <div class="fg"><label class="fl">Especialidade</label><input type="text" id="fEspec" placeholder="Ex.: Padrões de referência, solventes HPLC"></div>
     <div class="fg"><label class="fl">Matrizes atendidas</label><select id="fMat"><option>Água</option><option>Solo / Sedimento</option><option>Ar / Emissões</option><option>Efluente</option><option>Múltiplas matrizes</option></select></div>
-    <div class="fg"><label class="fl" id="fStatLabel">Status inicial</label><select id="fStat"><option>Em qualificação</option><option>Aprovado</option><option>Suspenso temporariamente</option><option>Descredenciado</option></select></div>
+    <div class="fg"><label class="fl" id="fStatLabel">Status</label><input type="text" id="fStat" readonly style="background:var(--bg2)"></div>
     <div class="fg"><label class="fl">Contato / e-mail</label><input type="text" id="fCont" placeholder="contato@fornecedor.com.br"></div>
     <div class="fg"><label class="fl">Periodicidade de reavaliação</label><select id="fPer"><option>Anual</option><option>Semestral</option><option>A cada 2 anos</option></select></div>
     <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
@@ -910,7 +911,7 @@ function renderDash() {
   document.getElementById('mReq').textContent = aber;
   document.getElementById('mIns').textContent = ins.length;
   var fornAp   = forns.filter(function(f){ return f.status==='Aprovado'; }).length;
-  var fornQual = forns.filter(function(f){ return f.status&&f.status!=='Aprovado'&&f.status!=='Reprovado'&&!f.status.startsWith('Desc'); }).length;
+  var fornQual = forns.filter(function(f){ return !f.status||(f.status!=='Aprovado'&&f.status!=='Reprovado'&&!f.status.startsWith('Desc')); }).length;
   document.getElementById('mFornAp').textContent   = fornAp;
   document.getElementById('msFornAp').textContent  = 'de '+forns.length+' cadastrados';
   document.getElementById('mFornQual').textContent = fornQual;
@@ -1376,9 +1377,9 @@ function sincFornIns(idx){
 function novoForn(){
   sv('fIdx','-1');
   clr(['fNome','fCnpj','fEspec','fCont','fObs']);
-  sv('fMat',''); sv('fStat','Em qualificação'); sv('fPer','Anual');
+  sv('fMat',''); sv('fStat','Em qualificação (sem avaliação ainda)'); sv('fPer','Anual');
   document.getElementById('shFornTitulo').childNodes[0].textContent='Novo fornecedor';
-  document.getElementById('fStatLabel').textContent='Status inicial';
+  document.getElementById('fStatLabel').textContent='Status';
   document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Cadastrar fornecedor';
   abrirSheet('shForn');
 }
@@ -1386,9 +1387,10 @@ function editarForn(idx){
   var f=(DB.get('fornecedores')||[])[idx]; if(!f) return;
   document.getElementById('fIdx').value=idx;
   sv('fNome',f.nome||''); sv('fCnpj',f.cnpj||''); sv('fEspec',f.espec||''); sv('fMat',f.matriz||'');
-  sv('fStat',f.status||'Em qualificação'); sv('fCont',f.contato||''); sv('fPer',f.period||'Anual'); sv('fObs',f.obs||'');
+  var statusTxt = f.status ? f.status+(f.mediaTotal!=null?' (média total '+f.mediaTotal+'/10)':'') : 'Em qualificação (sem avaliação ainda)';
+  sv('fStat',statusTxt); sv('fCont',f.contato||''); sv('fPer',f.period||'Anual'); sv('fObs',f.obs||'');
   document.getElementById('shFornTitulo').childNodes[0].textContent='Editar fornecedor';
-  document.getElementById('fStatLabel').textContent='Status';
+  document.getElementById('fStatLabel').textContent='Status (automático — conforme avaliação)';
   document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Salvar alterações';
   fecharDetalhe('dForn');
   abrirSheet('shForn');
@@ -1400,13 +1402,13 @@ function salvarForn(){
   var forns=DB.get('fornecedores')||[];
   if(!isNaN(idx)&&idx>=0&&forns[idx]){
     var f=forns[idx];
-    f.nome=nome; f.cnpj=gv('fCnpj'); f.espec=gv('fEspec'); f.matriz=gv('fMat'); f.status=gv('fStat');
+    f.nome=nome; f.cnpj=gv('fCnpj'); f.espec=gv('fEspec'); f.matriz=gv('fMat');
     f.contato=gv('fCont'); f.period=gv('fPer'); f.obs=gv('fObs');
     forns[idx]=f;
     DB.set('fornecedores',forns);
     toast(nome+' atualizado ✓');
   } else {
-    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:gv('fStat'),contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,avaliacoes:[],criadoEm:new Date().toISOString()});
+    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:null,contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,criadoEm:new Date().toISOString()});
     toast(nome+' cadastrado ✓');
   }
   fecharSheet('shForn');
@@ -1911,6 +1913,80 @@ function canvasToDataURL(id){
 // ============================================================
 // PDF & EMAIL
 // ============================================================
+function gerarRelatorioFornecedores(){
+  var forns=(DB.get('fornecedores')||[]).filter(function(f){ return f.status==='Aprovado'; });
+  var reqs=DB.get('requisicoes')||[];
+  var dataEmissao=new Date().toLocaleDateString('pt-BR');
+  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia'];
+
+  var corpo='';
+  if(forns.length===0){
+    corpo='<p style="color:#666;font-size:13px">Nenhum fornecedor aprovado no momento.</p>';
+  } else {
+    forns.forEach(function(f){
+      var avals=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; });
+      var iniHtml='<span style="color:#999">Sem avaliação inicial registrada</span>';
+      if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
+        iniHtml='<table class="mini"><tr>'+critNomesIni.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr><tr>'
+          +f.avaliacaoInicial.scores.map(function(s){ return '<td>'+(s==null?'NA':s)+'</td>'; }).join('')+'</tr></table>';
+      }
+      var pedidosHtml='<p style="color:#999;font-size:11.5px;margin:4px 0">Nenhum pedido avaliado (FO.061)</p>';
+      if(avals.length>0){
+        pedidosHtml='<table class="mini2"><tr><th>Pedido</th><th>Insumo</th><th>Data</th><th>Avaliador</th><th>Média</th></tr>'
+          +avals.map(function(r){
+            return '<tr><td>'+r.id+'</td><td>'+r.insumo+'</td><td>'+new Date(r.avaliacaoForn.data).toLocaleDateString('pt-BR')+'</td><td>'+(r.avaliacaoForn.resp||'—')+'</td><td><strong>'+r.avaliacaoForn.media+'/10</strong></td></tr>';
+          }).join('')+'</table>';
+      }
+      corpo+='<div class="forn-block">'
+        +'<div class="forn-head"><div><div class="forn-nome">'+f.nome+'</div><div class="forn-sub">'+(f.espec||f.matriz||'—')+(f.cnpj?' · '+f.cnpj:'')+'</div></div>'
+        +'<div class="forn-medias">'
+        +'<div class="mbox"><span>Inicial</span><strong>'+(f.mediaInicial!=null?f.mediaInicial:'—')+'</strong></div>'
+        +'<div class="mbox"><span>Monitoramento</span><strong>'+(f.mediaMonitoramento!=null?f.mediaMonitoramento:'—')+'</strong></div>'
+        +'<div class="mbox total"><span>Total</span><strong>'+(f.mediaTotal!=null?f.mediaTotal:'—')+'</strong></div>'
+        +'</div></div>'
+        +'<div class="sec-title">FO.008 — Avaliação inicial</div>'+iniHtml
+        +'<div class="sec-title">FO.061 — Avaliações por pedido ('+avals.length+')</div>'+pedidosHtml
+        +'</div>';
+    });
+  }
+
+  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:32px}'
+    +'.logo{display:flex;align-items:center;gap:12px;margin-bottom:6px}'
+    +'.logo-icon{width:44px;height:44px;background:#0F6E56;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}'
+    +'.logo-name{font-size:20px;font-weight:700;color:#0F6E56}.logo-sub{font-size:11px;color:#666}'
+    +'.divider{border:none;border-top:2px solid #0F6E56;margin:14px 0}'
+    +'.titulo{font-size:17px;font-weight:700;margin-bottom:4px}.subtitulo{font-size:11px;color:#666;margin-bottom:18px}'
+    +'.forn-block{border:1px solid #ddd;border-radius:8px;padding:14px 16px;margin-bottom:16px;page-break-inside:avoid}'
+    +'.forn-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}'
+    +'.forn-nome{font-size:14px;font-weight:700;color:#0F6E56}.forn-sub{font-size:11px;color:#666;margin-top:2px}'
+    +'.forn-medias{display:flex;gap:8px}'
+    +'.mbox{background:#f6f6f4;border-radius:6px;padding:6px 10px;text-align:center;min-width:70px}'
+    +'.mbox span{display:block;font-size:9.5px;color:#777;text-transform:uppercase}'
+    +'.mbox strong{font-size:15px}'
+    +'.mbox.total{background:#E1F5EE;color:#085041}'
+    +'.sec-title{font-size:10.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 5px}'
+    +'table.mini{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:4px}'
+    +'table.mini th{background:#f0f0ee;padding:4px 6px;text-align:center;font-weight:600}'
+    +'table.mini td{padding:4px 6px;text-align:center;border:1px solid #eee}'
+    +'table.mini2{width:100%;border-collapse:collapse;font-size:11px}'
+    +'table.mini2 th{background:#0F6E56;color:#fff;padding:5px 8px;text-align:left}'
+    +'table.mini2 td{padding:5px 8px;border-bottom:1px solid #eee}'
+    +'.footer{margin-top:20px;padding-top:14px;border-top:1px solid #ddd;font-size:11px;color:#888;display:flex;justify-content:space-between}'
+    +'@media print{body{padding:20px}.forn-block{break-inside:avoid}}'
+    +'</style></head><body>'
+    +'<div class="logo"><div class="logo-icon">🌿</div><div><div class="logo-name">Éllu Ambiental</div><div class="logo-sub">ISO/IEC 17025:2017 — Gestão de Fornecedores</div></div></div>'
+    +'<hr class="divider">'
+    +'<div class="titulo">Relatório de Fornecedores Aprovados</div>'
+    +'<div class="subtitulo">Emitido em '+dataEmissao+' · '+forns.length+' fornecedor'+(forns.length!==1?'es':'')+' aprovado'+(forns.length!==1?'s':'')+' · Critério: Média Total ≥ 7 (FO.008 + FO.061)</div>'
+    +corpo
+    +'<div class="footer"><span>Éllu Ambiental · ISO/IEC 17025:2017 §6.6.2</span><span>Gerado em '+dataEmissao+'</span></div>'
+    +'</body></html>';
+  var win=window.open('','_blank','width=900,height=700');
+  win.document.write(html); win.document.close(); win.focus();
+  setTimeout(function(){ win.print(); },500);
+}
+
 function gerarPDF(idx){
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
