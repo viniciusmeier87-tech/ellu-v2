@@ -1654,11 +1654,29 @@ function verFornDetalhe(idx){
     +critIniHtml
     +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">FO.061 — Avaliações por pedido</div>'
     +'<div class="card" style="margin-bottom:13px">'+avalHtml+'</div>'
-    +'<div style="display:flex;gap:8px">'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px">'
     +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>'+(f.avaliacaoInicial?'Editar avaliação inicial':'Avaliação inicial (FO.008)')+'</button>'
     +'<button class="btn bto btf" onclick="editarForn('+idx+')"><i class="ti ti-edit"></i>Editar</button>'
-    +'</div>';
+    +'</div>'
+    +(reqs.some(function(r){ return r.forn===f.nome; })
+      ? '<div class="alert" style="background:var(--xbg);color:var(--xtx)"><i class="ti ti-lock"></i><div>Este fornecedor possui pedidos de compra vinculados e não pode ser excluído.</div></div>'
+      : '<button class="btn btd btf" onclick="excluirForn('+idx+')"><i class="ti ti-trash"></i>Excluir fornecedor</button>');
   abrirDetalhe('dForn');
+}
+function excluirForn(idx){
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx]; if(!f) return;
+  var reqs=DB.get('requisicoes')||[];
+  if(reqs.some(function(r){ return r.forn===f.nome; })){
+    toast('Não é possível excluir: há pedidos vinculados a este fornecedor');
+    return;
+  }
+  if(!confirm('Excluir definitivamente o fornecedor "'+f.nome+'"? Essa ação não pode ser desfeita.')) return;
+  forns.splice(idx,1);
+  DB.set('fornecedores',forns);
+  fecharDetalhe('dForn');
+  renderForn(); renderDash(); atualizarFornSelect(); atualizarFornSelectReq();
+  toast('Fornecedor excluído ✓');
 }
 
 function prepAval(idx){
