@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Éllu Ambiental">
 <meta name="theme-color" content="#0F6E56">
 <title>Éllu Ambiental — ISO 17025</title>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <!-- Firebase -->
@@ -239,8 +239,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="met"><div class="ml">Insumos cadastrados</div><div class="mv" id="mIns">0</div><div class="ms" id="msIns">catálogo vazio</div></div>
     <div class="met"><div class="ml">Fornecedores aprovados</div><div class="mv" id="mFornAp">0</div><div class="ms" id="msFornAp">de 0 cadastrados</div></div>
     <div class="met"><div class="ml">Em qualificação</div><div class="mv" id="mFornQual">0</div><div class="ms" id="msFornQual">fornecedores</div></div>
-    <div class="met" id="metVenc"><div class="ml">Vencendo em 30 dias</div><div class="mv" id="mVenc">0</div><div class="ms" id="msVenc">insumos</div></div>
-    <div class="met" id="metEstBaixo"><div class="ml">Estoque baixo</div><div class="mv" id="mEstBaixo">0</div><div class="ms" id="msEstBaixo">insumos</div></div>
   </div>
   <div class="alert ai"><i class="ti ti-info-circle"></i><div>Cadastre insumos, qualifique fornecedores e crie pedidos conforme ISO 17025 §6.6.</div></div>
   <div class="card"><div class="ch"><span class="ct">Últimos pedidos de compra</span></div><div id="dashReqs"><div class="empty"><i class="ti ti-file-text"></i><div class="et">Nenhum pedido</div><div class="es">Crie na aba Compras</div></div></div></div>
@@ -272,17 +270,32 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <button class="btn bto bts" onclick="filtroIns('Efluente',this)" style="white-space:nowrap">Efluente</button>
     <button class="btn bto bts" onclick="filtroIns('Sedimento',this)" style="white-space:nowrap">Sedimento</button>
   </div>
+  <div class="fg" style="margin-bottom:10px"><select id="insOrdenar" onchange="ordenarInsUI(this.value)">
+    <option value="recentes">Mais recentes</option>
+    <option value="antigos">Mais antigos</option>
+    <option value="az">Nome (A-Z)</option>
+    <option value="za">Nome (Z-A)</option>
+    <option value="crit">Criticidade (alta primeiro)</option>
+  </select></div>
   <div class="card" id="liIns"><div class="empty" id="eIns"><i class="ti ti-flask"></i><div class="et">Catálogo vazio</div><div class="es">Toque + para cadastrar</div></div></div>
-  <button class="fab" onclick="novoIns()"><i class="ti ti-plus"></i></button>
+  <button class="fab" onclick="abrirSheet('shIns')"><i class="ti ti-plus"></i></button>
 </div>
 
 <!-- FORNECEDORES -->
 <div class="pg" id="pg-forn">
   <div style="padding-top:12px"></div>
+  <div class="sb2"><i class="ti ti-search"></i><input type="text" id="busFornInput" placeholder="Buscar fornecedor, CNPJ, especialidade..." oninput="buscarForn(this.value)"></div>
+  <div class="fg" style="margin-bottom:10px"><select id="fornOrdenar" onchange="ordenarFornUI(this.value)">
+    <option value="az">Nome (A-Z)</option>
+    <option value="za">Nome (Z-A)</option>
+    <option value="recentes">Mais recentes</option>
+    <option value="antigos">Mais antigos</option>
+    <option value="nota">Maior nota</option>
+    <option value="status">Status (Aprovados primeiro)</option>
+  </select></div>
   <div class="alert ai"><i class="ti ti-info-circle"></i><div>Apenas fornecedores <strong>Aprovados</strong> podem ser usados em pedidos — ISO 17025 §6.6.2.</div></div>
-  <button class="btn bto btf" style="margin-bottom:10px" onclick="gerarRelatorioFornecedores()"><i class="ti ti-file-type-pdf"></i>Relatório de fornecedores aprovados</button>
   <div class="card" id="liForn"><div class="empty" id="eForn"><i class="ti ti-building-store"></i><div class="et">Nenhum fornecedor</div><div class="es">Toque + para cadastrar</div></div></div>
-  <button class="fab" onclick="novoForn()"><i class="ti ti-plus"></i></button>
+  <button class="fab" onclick="abrirSheet('shForn')"><i class="ti ti-plus"></i></button>
 </div>
 
 <!-- NC -->
@@ -363,12 +376,14 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="shb">
     <div class="fg"><label class="fl">Selecionar do catálogo</label><select id="rCat" onchange="preencherReqDoCatalogo(this.value)"><option value="">— ou escolha um insumo cadastrado —</option></select></div>
     <div class="fg"><label class="fl">Insumo / descrição técnica</label><input type="text" id="rIns" placeholder="Nome do insumo"></div>
-    <div class="ci" style="padding:0 0 13px"><input type="checkbox" id="rContrato"><span style="font-size:13px">Pedido tipo <strong>contrato</strong> (itens enviados/recebidos aos poucos — ex.: calibração anual de equipamentos)</span></div>
     <div class="fg"><label class="fl">Tipo</label><select id="rTipo">
       <option>Insumos (consumíveis)</option>
       <option>Materiais de Referência (MR e MRC)</option>
       <option>Gases</option>
       <option>Equipamentos</option>
+      <option>EPI</option>
+      <option>Auditoria</option>
+      <option>Ensaio de Proficiência</option>
     </select></div>
     <div class="fg"><label class="fl">Matriz ambiental</label><select id="rMat"><option value="">— Selecione —</option><option>Água superficial</option><option>Água subterrânea</option><option>Solo</option><option>Sedimento</option><option>Ar / emissões atmosféricas</option><option>Efluente líquido</option></select></div>
     <div class="fg"><label class="fl">Criticidade</label><select id="rCrit"><option>Alta — afeta o resultado do ensaio</option><option>Média — suporte analítico</option><option>Baixa — uso geral</option></select></div>
@@ -390,15 +405,17 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- SHEET: Novo Insumo -->
 <div class="sbg" id="bgIns" onclick="fecharSheet('shIns')">
 <div class="sh" id="shIns" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht" id="shInsTitulo">Cadastrar insumo crítico<button class="shclose" onclick="fecharSheet('shIns')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Cadastrar insumo crítico<button class="shclose" onclick="fecharSheet('shIns')">✕</button></div>
   <div class="shb">
-    <input type="hidden" id="iIdx" value="-1">
     <div class="fg"><label class="fl">Nome do insumo</label><input type="text" id="iNome" placeholder="Ex.: Padrão Pb 1000mg/L NIST-traceable"></div>
     <div class="fg"><label class="fl">Tipo</label><select id="iTipo">
       <option>Insumos (consumíveis)</option>
       <option>Materiais de Referência (MR e MRC)</option>
       <option>Gases</option>
       <option>Equipamentos</option>
+      <option>EPI</option>
+      <option>Auditoria</option>
+      <option>Ensaio de Proficiência</option>
     </select></div>
     <div class="fg"><label class="fl">Matriz ambiental</label><select id="iMat"><option value="">— Selecione —</option><option>Água superficial</option><option>Água subterrânea</option><option>Solo</option><option>Sedimento</option><option>Ar / emissões atmosféricas</option><option>Efluente líquido</option></select></div>
     <div class="fg"><label class="fl">Criticidade</label><select id="iCrit"><option>Alta — afeta diretamente o resultado</option><option>Média — suporte analítico</option><option>Baixa — uso geral</option></select></div>
@@ -408,88 +425,46 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="fg"><label class="fl">Código de barras / referência</label>
       <div style="display:flex;gap:8px"><input type="text" id="iCod" placeholder="EAN ou código do produto" style="flex:1"><button class="btn bto bts" onclick="abrirScanner('iCod')"><i class="ti ti-scan"></i></button></div>
     </div>
-    <div class="fg"><label class="fl">Validade mínima exigida (meses)</label><input type="number" id="iVal" placeholder="Ex.: 12" min="1"></div>
-    <div class="fg"><label class="fl">Data de validade do lote atual</label><input type="date" id="iValMin"></div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 9px">Controle de estoque</div>
-    <div class="fg"><label class="fl">Unidade de medida</label><input type="text" id="iUnidade" placeholder="Ex.: frasco, litro, caixa, unidade"></div>
-    <div class="fg"><label class="fl" id="iEstAtualLabel">Estoque atual (inicial)</label><input type="number" id="iEstAtual" placeholder="0" min="0" step="0.01"></div>
-    <div class="fg"><label class="fl">Estoque mínimo (ponto de pedido)</label><input type="number" id="iEstMin" placeholder="0" min="0" step="0.01"></div>
     <div class="fg"><label class="fl">Observações / requisitos especiais</label><textarea id="iObs" placeholder="Armazenamento, transporte, certificados exigidos..."></textarea></div>
-    <button class="btn btp btf" onclick="salvarIns()" id="btnSalvarIns"><i class="ti ti-check"></i>Cadastrar insumo</button>
+    <button class="btn btp btf" onclick="salvarIns()"><i class="ti ti-check"></i>Cadastrar insumo</button>
   </div>
 </div></div>
 
 <!-- SHEET: Novo Fornecedor -->
 <div class="sbg" id="bgForn" onclick="fecharSheet('shForn')">
 <div class="sh" id="shForn" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht" id="shFornTitulo">Novo fornecedor<button class="shclose" onclick="fecharSheet('shForn')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Novo fornecedor<button class="shclose" onclick="fecharSheet('shForn')">✕</button></div>
   <div class="shb">
-    <input type="hidden" id="fIdx" value="-1">
     <div class="fg"><label class="fl">Razão social</label><input type="text" id="fNome" placeholder="Razão social completa"></div>
-    <div class="fg"><label class="fl">CNPJ</label><input type="text" id="fCnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="fg"><label class="fl">CNPJ</label><input type="text" id="fCnpj" placeholder="00.000.000/0001-00" maxlength="18" inputmode="numeric" oninput="formatarCNPJInput(this)"></div>
     <div class="fg"><label class="fl">Especialidade</label><input type="text" id="fEspec" placeholder="Ex.: Padrões de referência, solventes HPLC"></div>
     <div class="fg"><label class="fl">Matrizes atendidas</label><select id="fMat"><option>Água</option><option>Solo / Sedimento</option><option>Ar / Emissões</option><option>Efluente</option><option>Múltiplas matrizes</option></select></div>
-    <div class="fg"><label class="fl" id="fStatLabel">Status</label><input type="text" id="fStat" readonly style="background:var(--bg2)"></div>
+    <div class="fg"><label class="fl">Status inicial</label><select id="fStat"><option>Em qualificação</option><option>Aprovado</option></select></div>
     <div class="fg"><label class="fl">Contato / e-mail</label><input type="text" id="fCont" placeholder="contato@fornecedor.com.br"></div>
     <div class="fg"><label class="fl">Periodicidade de reavaliação</label><select id="fPer"><option>Anual</option><option>Semestral</option><option>A cada 2 anos</option></select></div>
-    <div class="fg">
-      <label class="fl">Critérios específicos de competência (conforme serviço/insumo)</label>
-      <div style="font-size:11.5px;color:var(--tx2);margin-bottom:7px">Marque apenas os critérios técnicos aplicáveis a este fornecedor — eles entrarão na avaliação inicial (FO.008) junto com os critérios gerais.</div>
-      <div class="card" id="fCritEspecBox" style="padding:4px 0"></div>
-    </div>
     <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
-    <button class="btn btp btf" onclick="salvarForn()" id="btnSalvarForn"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
-  </div>
-</div></div>
-
-<!-- SHEET: Movimentação de Estoque -->
-<div class="sbg" id="bgEstoque" onclick="fecharSheet('shEstoque')">
-<div class="sh" id="shEstoque" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht" id="shEstoqueTitulo">Movimentação de estoque<button class="shclose" onclick="fecharSheet('shEstoque')">✕</button></div>
-  <div class="shb">
-    <input type="hidden" id="estIdx">
-    <input type="hidden" id="estTipo">
-    <div class="ib2" id="estInfo">—</div>
-    <div class="fg"><label class="fl">Quantidade</label><input type="number" id="estQtd" min="0.01" step="0.01" placeholder="0"></div>
-    <div class="fg"><label class="fl">Motivo</label><select id="estMotivo">
-      <option>Recebimento de pedido</option>
-      <option>Consumo em ensaio</option>
-      <option>Ajuste de inventário</option>
-      <option>Descarte / vencimento</option>
-      <option>Outro</option>
-    </select></div>
-    <div class="fg"><label class="fl">Responsável</label><select id="estResp"><option value="">— Selecione —</option></select></div>
-    <div class="fg"><label class="fl">Observações</label><textarea id="estObs" placeholder="Detalhes da movimentação..."></textarea></div>
-    <button class="btn btp btf" id="btnSalvarEst" onclick="salvarMovEstoque()"><i class="ti ti-check"></i>Registrar</button>
+    <button class="btn btp btf" onclick="salvarForn()"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
   </div>
 </div></div>
 
 <!-- SHEET: Avaliação Fornecedor -->
 <div class="sbg" id="bgAval" onclick="fecharSheet('shAval')">
 <div class="sh" id="shAval" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht">Avaliação inicial — FO.008<button class="shclose" onclick="fecharSheet('shAval')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Avaliar fornecedor — §6.6.2<button class="shclose" onclick="fecharSheet('shAval')">✕</button></div>
   <div class="shb">
     <div class="ib2" id="avalInfo">—</div>
     <input type="hidden" id="avalIdx">
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios FO.008 — nota de 0 a 10 (deixe vazio para NA)</div>
-    <div class="card" style="margin-bottom:13px">
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">1. Qualidade</div><input type="number" id="av0" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">2. Localização</div><input type="number" id="av1" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">3. Política de entrega</div><input type="number" id="av2" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">4. Preço</div><input type="number" id="av3" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">5. Prazo certificados</div><input type="number" id="av4" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">6. Assistência técnica</div><input type="number" id="av5" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">7. Garantia</div><input type="number" id="av6" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-      <div class="ah" style="border-bottom:none"><div style="font-size:13px;margin-bottom:6px">8. Atender especificações da Matriz de Competência</div><input type="number" id="av7" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalIni()"></div>
-    </div>
-    <div id="avalEspecBox" style="display:none">
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios específicos deste fornecedor</div>
-      <div class="card" id="avalEspecCard" style="margin-bottom:13px"></div>
-    </div>
-    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Avaliação Inicial</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:13px">Critérios — nota de 1 a 5</div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>1. Qualidade e pureza dos insumos</span><span style="font-weight:700;color:var(--g)" id="sv0">—</span></div><div id="sb0"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>2. Conformidade documental (CoA)</span><span style="font-weight:700;color:var(--g)" id="sv1">—</span></div><div id="sb1"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>3. Cumprimento de prazos</span><span style="font-weight:700;color:var(--g)" id="sv2">—</span></div><div id="sb2"></div></div>
+    <div class="cr"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>4. Tratamento de não conformidades</span><span style="font-weight:700;color:var(--g)" id="sv3">—</span></div><div id="sb3"></div></div>
+    <div class="cr" style="border-bottom:none"><div style="font-size:13px;margin-bottom:7px;display:flex;justify-content:space-between"><span>5. Capacidade técnica ambiental</span><span style="font-weight:700;color:var(--g)" id="sv4">—</span></div><div id="sb4"></div></div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Nota geral calculada</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="notaG">—</span></div>
+    <div class="fg"><label class="fl">Decisão</label><select id="avalDec"><option>Aprovado</option><option>Aprovado com condições</option><option>Suspenso temporariamente</option><option>Descredenciado</option></select></div>
     <div class="fg"><label class="fl">Observações e evidências</label><textarea id="avalObs" placeholder="Evidências, NC relacionadas, melhorias..."></textarea></div>
     <div class="fg"><label class="fl">Próxima reavaliação</label><input type="date" id="avalProx"></div>
-    <button class="btn btp btf" onclick="salvarAval()"><i class="ti ti-star"></i>Salvar avaliação inicial</button>
+    <button class="btn btp btf" onclick="salvarAval()"><i class="ti ti-star"></i>Salvar avaliação</button>
   </div>
 </div></div>
 
@@ -633,24 +608,37 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- SHEET: Avaliação do Fornecedor por Pedido -->
 <div class="sbg" id="bgAvalFornPC" onclick="fecharSheet('shAvalFornPC')">
 <div class="sh" id="shAvalFornPC" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht">Avaliação por pedido — FO.061<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
+  <div class="shdl"></div><div class="sht">Avaliar fornecedor do pedido<button class="shclose" onclick="fecharSheet('shAvalFornPC')">✕</button></div>
   <div class="shb">
     <input type="hidden" id="avalFornPCIdx">
-    <input type="hidden" id="avalFornPCItemIdx">
     <div class="ib2" id="avalFornPCInfo">—</div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Critérios FO.061 — nota de 0 a 10 (deixe vazio para NA)</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Critérios de avaliação do fornecedor</div>
     <div class="card" style="margin-bottom:13px">
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">1. Prazo</div><input type="number" id="afpc0" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">2. Especificações</div><input type="number" id="afpc1" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">3. Quantidade</div><input type="number" id="afpc2" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">4. Qualidade</div><input type="number" id="afpc3" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">5. Validade</div><input type="number" id="afpc4" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">6. Documentação</div><input type="number" id="afpc5" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">7. Embalagem</div><input type="number" id="afpc6" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">8. Rotulagem</div><input type="number" id="afpc7" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
-      <div class="ah"><div style="font-size:13px;margin-bottom:6px">9. Critérios de aceitação</div><input type="number" id="afpc8" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" oninput="calcAvalFornPC()"></div>
+      <div class="ci"><input type="checkbox" id="afpc1"><span style="font-size:13px">Entregou no prazo combinado</span></div>
+      <div class="ci"><input type="checkbox" id="afpc2"><span style="font-size:13px">Qualidade conforme especificação</span></div>
+      <div class="ci"><input type="checkbox" id="afpc3"><span style="font-size:13px">Documentação completa (CoA, NF, laudos)</span></div>
+      <div class="ci"><input type="checkbox" id="afpc4"><span style="font-size:13px">Quantidade e embalagem corretas</span></div>
+      <div class="ci"><input type="checkbox" id="afpc5"><span style="font-size:13px">Rastreabilidade / certificados presentes</span></div>
+      <div class="ci"><input type="checkbox" id="afpc6"><span style="font-size:13px">Atendimento e comunicação adequados</span></div>
     </div>
-    <div style="background:var(--bg2);border-radius:var(--r);padding:11px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600">Média deste pedido</span><span style="font-size:22px;font-weight:700;color:var(--g)" id="avalFornPCNotaTxt">—</span></div>
+    <div class="fg"><label class="fl">Nota geral (1–5)</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="avalFornPCStars">
+        <button class="sb3" onclick="setNotaFornPC(1)">1</button>
+        <button class="sb3" onclick="setNotaFornPC(2)">2</button>
+        <button class="sb3" onclick="setNotaFornPC(3)">3</button>
+        <button class="sb3" onclick="setNotaFornPC(4)">4</button>
+        <button class="sb3" onclick="setNotaFornPC(5)">5</button>
+        <span id="avalFornPCNotaTxt" style="font-size:13px;color:var(--tx2);align-self:center">—</span>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Resultado</label>
+      <select id="avalFornPCRes">
+        <option value="Aprovado">✅ Aprovado — manter</option>
+        <option value="Aprovado com condições">⚠️ Aprovado com condições</option>
+        <option value="Suspenso temporariamente">🔴 Suspenso temporariamente</option>
+        <option value="Descredenciado">❌ Descredenciado</option>
+      </select>
+    </div>
     <div class="fg"><label class="fl">Observações</label><textarea id="avalFornPCObs" placeholder="Desvios, pontos de melhoria..."></textarea></div>
     <div class="fg"><label class="fl">Avaliador</label><select id="avalFornPCResp"><option value="">— Selecione —</option></select></div>
     <button class="btn btp btf" onclick="salvarAvalFornPC()"><i class="ti ti-check"></i>Registrar avaliação</button>
@@ -929,15 +917,24 @@ function statusBadge(s){
   return m[s]||'<span class="b bx">'+s+'</span>';
 }
 function fornStatus(s){
-  if(!s) return '<span class="b bx">Em qualificação</span>';
+  if(!s) return '<span class="b bx">—</span>';
   if(s==='Aprovado') return '<span class="b bg">Aprovado</span>';
-  if(s==='Reprovado'||s.startsWith('Suspenso')||s==='Descredenciado') return '<span class="b br">'+s.split(' ')[0]+'</span>';
+  if(s.startsWith('Suspenso')||s==='Descredenciado') return '<span class="b br">'+s.split(' ')[0]+'</span>';
   return '<span class="b ba">'+s.split(' ')[0]+'</span>';
 }
 function fmt(iso){ try{ return new Date(iso+'T12:00').toLocaleDateString('pt-BR'); }catch(e){ return iso||'—'; } }
 function gv(id){ var e=document.getElementById(id); return e?e.value:''; }
 function sv(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; }
 function clr(ids){ ids.forEach(function(id){ sv(id,''); }); }
+function formatarCNPJInput(el){
+  var d=el.value.replace(/\D/g,'').slice(0,14);
+  var out=d;
+  if(d.length>12) out=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/,'$1.$2.$3/$4-$5');
+  else if(d.length>8) out=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/,'$1.$2.$3/$4');
+  else if(d.length>5) out=d.replace(/^(\d{2})(\d{3})(\d{1,3})$/,'$1.$2.$3');
+  else if(d.length>2) out=d.replace(/^(\d{2})(\d{1,3})$/,'$1.$2');
+  el.value=out;
+}
 
 // ============================================================
 // DASHBOARD
@@ -950,27 +947,11 @@ function renderDash() {
   document.getElementById('mReq').textContent = aber;
   document.getElementById('mIns').textContent = ins.length;
   var fornAp   = forns.filter(function(f){ return f.status==='Aprovado'; }).length;
-  var fornQual = forns.filter(function(f){ return !f.status||(f.status!=='Aprovado'&&f.status!=='Reprovado'&&!f.status.startsWith('Desc')); }).length;
+  var fornQual = forns.filter(function(f){ return f.status&&f.status!=='Aprovado'&&!f.status.startsWith('Desc'); }).length;
   document.getElementById('mFornAp').textContent   = fornAp;
   document.getElementById('msFornAp').textContent  = 'de '+forns.length+' cadastrados';
   document.getElementById('mFornQual').textContent = fornQual;
   document.getElementById('msFornQual').textContent= fornQual===1?'fornecedor':'fornecedores';
-  var hoje = new Date(); hoje.setHours(0,0,0,0);
-  var lim30 = new Date(hoje); lim30.setDate(lim30.getDate()+30);
-  var venc = ins.filter(function(i){ if(!i.valMin) return false; var d=new Date(i.valMin+'T12:00'); return d>=hoje&&d<=lim30; }).length;
-  document.getElementById('mVenc').textContent = venc;
-  document.getElementById('msVenc').textContent = venc===0?'nenhum vencendo':'insumo'+(venc===1?'':'s');
-  var metVenc = document.getElementById('metVenc');
-  metVenc.style.borderColor = venc>0?'#EF9F27':'';
-  metVenc.style.background  = venc>0?'var(--abg)':'';
-  document.getElementById('mVenc').style.color = venc>0?'var(--atx)':'';
-  var estBaixo = ins.filter(function(i){ return i.estoqueAtual!=null && (i.estoqueAtual<=0 || (i.estoqueMinimo>0 && i.estoqueAtual<=i.estoqueMinimo)); }).length;
-  document.getElementById('mEstBaixo').textContent = estBaixo;
-  document.getElementById('msEstBaixo').textContent = estBaixo===0?'tudo OK':'insumo'+(estBaixo===1?'':'s')+' em alerta';
-  var metEst = document.getElementById('metEstBaixo');
-  metEst.style.borderColor = estBaixo>0?'#791F1F':'';
-  metEst.style.background  = estBaixo>0?'var(--rbg)':'';
-  document.getElementById('mEstBaixo').style.color = estBaixo>0?'var(--rtx)':'';
   document.getElementById('msReq').textContent  = aber===0?'nenhum': reqs.filter(function(r){return r.status==='aprovacao';}).length+' aguard. aprov.';
   document.getElementById('msIns').textContent  = ins.length===0?'catálogo vazio': ins.filter(function(i){return i.critici&&i.critici.startsWith('Alta');}).length+' críticos';
   var box = document.getElementById('dashReqs');
@@ -1014,10 +995,9 @@ function salvarReq() {
     var su=users[parseInt(solic)];
     if(su) solicNome=su.nome;
   }
-  var isContrato = document.getElementById('rContrato').checked;
-  DB.push('requisicoes',{id:id,insumo:ins,tipo:gv('rTipo'),matriz:gv('rMat'),critici:gv('rCrit'),spec:gv('rSpec'),qtd:gv('rQtd'),solic:solicNome,data:gv('rData'),just:gv('rJust'),forn:fornNome,fornEmail:fornEmail,status:'aprovacao',contrato:isContrato,itens:(isContrato?[]:undefined),criadoEm:new Date().toISOString()});
+  DB.push('requisicoes',{id:id,insumo:ins,tipo:gv('rTipo'),matriz:gv('rMat'),critici:gv('rCrit'),spec:gv('rSpec'),qtd:gv('rQtd'),solic:solicNome,data:gv('rData'),just:gv('rJust'),forn:fornNome,fornEmail:fornEmail,status:'aprovacao',criadoEm:new Date().toISOString()});
   fecharSheet('shReq');
-  clr(['rIns','rSpec','rQtd','rData','rJust']); sv('rCat',''); sv('rSolic',''); sv('rForn',''); sv('rFornEmail',''); document.getElementById('rContrato').checked=false;
+  clr(['rIns','rSpec','rQtd','rData','rJust']); sv('rCat',''); sv('rSolic',''); sv('rForn',''); sv('rFornEmail','');
   renderReqs(); renderDash();
   toast(id+' enviado para aprovação ✓');
 }
@@ -1078,26 +1058,21 @@ function verReqDetalhe(idx){
   var p = usuarioAtual?usuarioAtual.perfil:'';
   if(r.status==='aprovacao'&&(temPerfil(usuarioAtual,'admin')||temPerfil(usuarioAtual,'aprovador'))){
     aprovBtn='<button class="btn btp btf" style="margin-top:4px" onclick="prepAprov('+idx+')"><i class="ti ti-check"></i>Aprovar / Rejeitar</button>';
-  } else if(r.status==='compra'&&!r.contrato){
+  } else if(r.status==='compra'){
     aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
       +'<button class="btn btp btf" onclick="concluirReq('+idx+')"><i class="ti ti-package"></i>Marcar como concluída</button>'
       +'<div style="display:flex;gap:8px">'
       +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
       +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
       +'</div></div>';
-  } else if(r.status==='compra'&&r.contrato){
-    aprovBtn='<div style="display:flex;gap:8px;margin-top:4px">'
-      +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
-      +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
-      +'</div>';
   } else if(r.status==='concluido'){
     var jaAvaliado = r.avaliacao ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-check"></i><div>Avaliado: <strong>'+r.avaliacao.resultado+'</strong></div></div>' : '';
-    var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado (FO.061) — média <strong>'+r.avaliacaoForn.media+'/10</strong></div></div>' : '';
+    var jaAvalForn = r.avaliacaoForn ? '<div class="alert ai" style="margin-top:4px"><i class="ti ti-building-store"></i><div>Fornecedor avaliado: <strong>'+r.avaliacaoForn.resultado+'</strong> · ⭐ '+r.avaliacaoForn.nota+'/5</div></div>' : '';
     aprovBtn='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'
       +(!r.avaliacao?'<button class="btn btp btf" onclick="prepAvalPC('+idx+')"><i class="ti ti-star"></i>Avaliar pedido</button>':'')
       +jaAvaliado
-      +(!r.contrato&&r.forn&&!r.avaliacaoForn?'<button class="btn bto btf" onclick="prepAvalFornPC('+idx+')"><i class="ti ti-building-store"></i>Avaliar fornecedor</button>':'')
-      +(!r.contrato?jaAvalForn:'')
+      +(r.forn&&!r.avaliacaoForn?'<button class="btn bto btf" onclick="prepAvalFornPC('+idx+')"><i class="ti ti-building-store"></i>Avaliar fornecedor</button>':'')
+      +jaAvalForn
       +'<div style="display:flex;gap:8px">'
       +'<button class="btn bto btf" onclick="gerarPDF('+idx+')"><i class="ti ti-file-type-pdf"></i>Gerar PDF</button>'
       +'<button class="btn bto btf" onclick="enviarEmail('+idx+')"><i class="ti ti-mail"></i>E-mail</button>'
@@ -1121,68 +1096,17 @@ function verReqDetalhe(idx){
       +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacao.criteriosOK+'/6</div></div>'
       +(r.avaliacao.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacao.obs+'</div></div>':'')
       +'</div>':'')
-    +(r.avaliacaoForn?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do fornecedor — FO.061</div>'
+    +(r.avaliacaoForn?'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Avaliação do fornecedor</div>'
       +'<div class="card" style="margin-bottom:11px">'
       +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor</div><div class="iv">'+(r.forn||'—')+'</div></div>'
-      +'<div class="ir" style="padding:10px 14px"><div class="ik">Média do pedido</div><div class="iv">'+r.avaliacaoForn.media+'/10</div></div>'
-      +(r.avaliacaoForn.resp?'<div class="ir" style="padding:10px 14px"><div class="ik">Avaliador</div><div class="iv">'+r.avaliacaoForn.resp+'</div></div>':'')
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Resultado</div><div class="iv">'+r.avaliacaoForn.resultado+'</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Nota</div><div class="iv">⭐ '+r.avaliacaoForn.nota+'/5</div></div>'
+      +'<div class="ir" style="padding:10px 14px"><div class="ik">Critérios OK</div><div class="iv">'+r.avaliacaoForn.criteriosOK+'/6</div></div>'
       +(r.avaliacaoForn.obs?'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Obs.</div><div class="iv" style="font-size:12px">'+r.avaliacaoForn.obs+'</div></div>':'')
       +'</div>':'')
     +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de movimentações</div>'
     +'<div class="card" style="margin-bottom:13px">'+histHtml+'</div>';
-  if(r.contrato&&(r.status==='compra'||r.status==='concluido')){
-    document.getElementById('dReqB').innerHTML = itensContratoHtml(r,idx) + document.getElementById('dReqB').innerHTML;
-  }
   abrirDetalhe('dReq');
-}
-
-function itensContratoHtml(r,idx){
-  var itens=r.itens||[];
-  var statusCor={'Aguardando envio':'var(--tx3)','Enviado':'var(--btx)','Recebido':'var(--gtx)'};
-  var statusClasse={'Aguardando envio':'bx','Enviado':'bb','Recebido':'bg'};
-  var itensHtml = itens.length>0
-    ? itens.map(function(it,i){
-        var acao='';
-        if(it.status==='Aguardando envio'){
-          acao='<button class="btn bto bts" onclick="marcarItemEnviado('+idx+','+i+')"><i class="ti ti-truck"></i>Marcar enviado</button>';
-        } else if(it.status==='Enviado'){
-          acao='<button class="btn btp bts" onclick="prepAvalFornPC('+idx+','+i+')"><i class="ti ti-package-import"></i>Registrar recepção e avaliar</button>';
-        } else if(it.status==='Recebido'&&it.avaliacaoForn){
-          acao='<span style="font-size:11px;color:var(--gtx)">Média '+it.avaliacaoForn.media+'/10</span>';
-        }
-        return '<div class="ah"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">'
-          +'<div style="font-size:13px;font-weight:500">'+it.nome+'</div>'
-          +'<span class="b '+(statusClasse[it.status]||'bx')+'">'+it.status+'</span></div>'
-          +'<div>'+acao+'</div></div>';
-      }).join('')
-    : '<div class="empty" style="padding:22px"><i class="ti ti-list"></i><div class="et" style="font-size:13px">Nenhum item adicionado ainda</div></div>';
-  return '<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Itens do contrato ('+itens.filter(function(it){return it.status==='Recebido';}).length+'/'+itens.length+' recebidos)</div>'
-    +'<div class="card" style="margin-bottom:11px">'+itensHtml+'</div>'
-    +'<button class="btn bto btf" style="margin-bottom:16px" onclick="adicionarItemContrato('+idx+')"><i class="ti ti-plus"></i>Adicionar equipamento/item</button>';
-}
-
-function adicionarItemContrato(idx){
-  var nome=window.prompt('Nome do equipamento/item a adicionar ao contrato:');
-  if(!nome||!nome.trim()) return;
-  var reqs=DB.get('requisicoes')||[];
-  var r=reqs[idx]; if(!r) return;
-  if(!r.itens) r.itens=[];
-  r.itens.push({nome:nome.trim(),status:'Aguardando envio',dataEnvio:null,dataRetorno:null});
-  reqs[idx]=r;
-  DB.set('requisicoes',reqs);
-  toast('Item adicionado ao contrato ✓');
-  verReqDetalhe(idx);
-}
-
-function marcarItemEnviado(idx,itemIdx){
-  var reqs=DB.get('requisicoes')||[];
-  var r=reqs[idx]; if(!r||!r.itens||!r.itens[itemIdx]) return;
-  r.itens[itemIdx].status='Enviado';
-  r.itens[itemIdx].dataEnvio=new Date().toISOString();
-  reqs[idx]=r;
-  DB.set('requisicoes',reqs);
-  toast('Item marcado como enviado ✓');
-  verReqDetalhe(idx);
 }
 
 function prepAprov(idx){
@@ -1328,97 +1252,64 @@ function sincFornReq(idx){
 // INSUMOS
 // ============================================================
 var insFiltroMatriz='';
-function novoIns(){
-  sv('iIdx','-1');
-  clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail','');
-  sv('iTipo','Insumos (consumíveis)'); sv('iMat',''); sv('iCrit','Alta — afeta diretamente o resultado');
-  sv('iUnidade',''); sv('iEstAtual','0'); sv('iEstMin','0');
-  document.getElementById('iEstAtualLabel').textContent='Estoque atual (inicial)';
-  var fornSel=document.getElementById('iFornSel'); if(fornSel) fornSel.selectedIndex=0;
-  document.getElementById('shInsTitulo').childNodes[0].textContent='Cadastrar insumo crítico';
-  document.getElementById('btnSalvarIns').innerHTML='<i class="ti ti-check"></i>Cadastrar insumo';
-  abrirSheet('shIns');
-}
-function editarIns(idx){
-  var ins=(DB.get('insumos')||[])[idx]; if(!ins) return;
-  document.getElementById('iIdx').value=idx;
-  sv('iNome',ins.nome||''); sv('iTipo',ins.tipo||''); sv('iMat',ins.matriz||''); sv('iCrit',ins.critici||'');
-  sv('iSpec',ins.spec||''); sv('iCod',ins.codigo||''); sv('iVal',ins.validade||''); sv('iValMin',ins.valMin||''); sv('iObs',ins.obs||'');
-  sv('iUnidade',ins.unidade||''); sv('iEstAtual',(ins.estoqueAtual!=null?ins.estoqueAtual:0)); sv('iEstMin',(ins.estoqueMinimo!=null?ins.estoqueMinimo:0));
-  document.getElementById('iEstAtualLabel').textContent='Estoque atual (ajuste manual)';
-  var fornSel=document.getElementById('iFornSel');
-  if(fornSel){
-    var opIdx=0;
-    for(var i=0;i<fornSel.options.length;i++){ if(fornSel.options[i].text===ins.forn){ opIdx=i; break; } }
-    fornSel.selectedIndex=opIdx;
-  }
-  sv('iFornEmail',ins.fornEmail||'');
-  document.getElementById('shInsTitulo').childNodes[0].textContent='Editar insumo';
-  document.getElementById('btnSalvarIns').innerHTML='<i class="ti ti-check"></i>Salvar alterações';
-  fecharDetalhe('dIns');
-  abrirSheet('shIns');
-}
+var insOrdenacaoAtual='recentes';
 function salvarIns(){
   var nome=gv('iNome').trim();
   if(!nome){ toast('Preencha o nome do insumo'); return; }
-  var idx=parseInt(gv('iIdx'));
   var fornSel=document.getElementById('iFornSel');
   var fornNome=fornSel&&fornSel.selectedIndex>0?fornSel.options[fornSel.selectedIndex].text:'';
   var fornEmail=gv('iFornEmail');
-  var estAtual=parseFloat(gv('iEstAtual')); if(isNaN(estAtual)) estAtual=0;
-  var estMin=parseFloat(gv('iEstMin')); if(isNaN(estMin)) estMin=0;
-  var dados={nome:nome,tipo:gv('iTipo'),matriz:gv('iMat'),critici:gv('iCrit'),spec:gv('iSpec'),forn:fornNome,fornEmail:fornEmail,codigo:gv('iCod'),validade:gv('iVal'),valMin:gv('iValMin'),obs:gv('iObs'),unidade:gv('iUnidade'),estoqueAtual:estAtual,estoqueMinimo:estMin};
-  var ins=DB.get('insumos')||[];
-  if(!isNaN(idx)&&idx>=0&&ins[idx]){
-    dados.criadoEm=ins[idx].criadoEm;
-    dados.movimentos=ins[idx].movimentos||[];
-    ins[idx]=dados;
-    DB.set('insumos',ins);
-    toast('"'+nome+'" atualizado ✓');
-  } else {
-    dados.criadoEm=new Date().toISOString();
-    dados.movimentos=[];
-    DB.push('insumos',dados);
-    toast('"'+nome+'" cadastrado ✓');
-  }
+  DB.push('insumos',{nome:nome,tipo:gv('iTipo'),matriz:gv('iMat'),critici:gv('iCrit'),spec:gv('iSpec'),forn:fornNome,fornEmail:fornEmail,codigo:gv('iCod'),obs:gv('iObs'),criadoEm:new Date().toISOString()});
   fecharSheet('shIns');
-  clr(['iNome','iSpec','iCod','iVal','iObs']); sv('iValMin',''); sv('iFornEmail',''); sv('iIdx','-1'); sv('iUnidade',''); sv('iEstAtual','0'); sv('iEstMin','0');
+  clr(['iNome','iSpec','iCod','iObs']); sv('iFornEmail','');
   if(fornSel) fornSel.selectedIndex=0;
   renderIns(); atualizarCatalogSelect(); renderDash();
+  toast('"'+nome+'" cadastrado ✓');
 }
 
-function estoqueStatusInfo(ins){
-  var atual=ins.estoqueAtual!=null?ins.estoqueAtual:null;
-  var min=ins.estoqueMinimo!=null?ins.estoqueMinimo:0;
-  if(atual==null) return {label:'—',cor:'var(--tx3)',critico:false};
-  if(atual<=0) return {label:'Esgotado',cor:'var(--rtx)',critico:true};
-  if(min>0&&atual<=min) return {label:'Baixo',cor:'#EF9F27',critico:true};
-  return {label:'OK',cor:'var(--gtx)',critico:false};
+function ordenarInsumos(data, order){
+  var arr=data.slice();
+  switch(order){
+    case 'az': arr.sort(function(a,b){ return (a.item.nome||'').localeCompare(b.item.nome||''); }); break;
+    case 'za': arr.sort(function(a,b){ return (b.item.nome||'').localeCompare(a.item.nome||''); }); break;
+    case 'antigos': arr.sort(function(a,b){ return new Date(a.item.criadoEm)-new Date(b.item.criadoEm); }); break;
+    case 'crit':
+      var ordem={'Alta':0,'Média':1,'Baixa':2};
+      arr.sort(function(a,b){
+        var ca=(a.item.critici||'').split(' ')[0], cb=(b.item.critici||'').split(' ')[0];
+        return (ordem[ca]!==undefined?ordem[ca]:9)-(ordem[cb]!==undefined?ordem[cb]:9);
+      });
+      break;
+    default:
+      arr.sort(function(a,b){ return new Date(b.item.criadoEm)-new Date(a.item.criadoEm); });
+  }
+  return arr;
 }
+
 function renderIns(busca,mat){
   var insAll=DB.get('insumos')||[];
   var lista=document.getElementById('liIns');
   lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
   var empty=document.getElementById('eIns');
-  var b=busca||document.getElementById('busInsInput').value||'';
+  var b=busca!==undefined?busca:(document.getElementById('busInsInput').value||'');
   var m=mat!==undefined?mat:insFiltroMatriz;
-  var data=insAll.slice().reverse().filter(function(i){
+  var data=insAll.map(function(item,idx){ return {item:item,idx:idx}; }).filter(function(o){
+    var i=o.item;
     if(m&&!(i.matriz&&i.matriz.toLowerCase().startsWith(m.toLowerCase()))) return false;
     if(b&&JSON.stringify(i).toLowerCase().indexOf(b.toLowerCase())<0) return false;
     return true;
   });
+  data=ordenarInsumos(data, insOrdenacaoAtual);
   empty.style.display=data.length===0?'':'none';
-  data.forEach(function(ins){
-    var realIdx = insAll.indexOf(ins);
+  data.forEach(function(o){
+    var ins=o.item, realIdx=o.idx;
     var el=document.createElement('div'); el.className='li';
     var ic=MICON[ins.matriz]||'ti-flask';
-    var est=estoqueStatusInfo(ins);
-    var estTxt=(ins.estoqueAtual!=null)?('<span style="font-size:10.5px;font-weight:700;color:'+est.cor+'">'+ins.estoqueAtual+(ins.unidade?' '+ins.unidade:'')+' · '+est.label+'</span>'):'';
     el.innerHTML='<div class="lic" style="background:var(--bbg);color:var(--btx)"><i class="ti '+ic+'"></i></div>'
       +'<div class="lib"><div class="lit">'+(ins.nome||'—')+'</div><div class="lis">'+(ins.forn||'—')+'</div>'
-      +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span>'+estTxt+'</div></div>'
+      +'<div class="trow">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—').split(' ')[0]+'</span></div></div>'
       +'<div class="lir"><i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i></div>';
-    (function(item,idx){ el.onclick=function(){ verInsDetalhe(item,idx); }; })(ins,realIdx);
+    (function(idx){ el.onclick=function(){ verInsDetalhe(idx); }; })(realIdx);
     lista.appendChild(el);
   });
 }
@@ -1429,97 +1320,43 @@ function filtroIns(m,btn){
   if(btn){ btn.style.borderColor='var(--g)'; btn.style.color='var(--g)'; }
   renderIns();
 }
+function ordenarInsUI(v){ insOrdenacaoAtual=v; renderIns(); }
 
-function verInsDetalhe(ins,realIdx){
+function verInsDetalhe(idx){
+  var insAll=DB.get('insumos')||[];
+  var ins=insAll[idx]; if(!ins) return;
   document.getElementById('dInsT').textContent=ins.nome||'—';
   document.getElementById('dInsS').textContent=(ins.matriz||'—')+' · '+(ins.critici?ins.critici.split(' ')[0]:'—');
-  var hoje2=new Date(); hoje2.setHours(0,0,0,0);
-  var lim30b=new Date(hoje2); lim30b.setDate(lim30b.getDate()+30);
-  var valMinHtml='—';
-  if(ins.valMin){
-    var dv=new Date(ins.valMin+'T12:00');
-    var vencendo=dv<=lim30b; var vencido=dv<hoje2;
-    valMinHtml='<span style="color:'+(vencido?'var(--rtx)':vencendo?'#EF9F27':'inherit')+'">'+fmt(ins.valMin)+(vencido?' ⚠ Vencido':vencendo?' ⚠ Vencendo':'')+'</span>';
-  }
-  var est=estoqueStatusInfo(ins);
-  var movs=ins.movimentos||[];
-  var movHtml=movs.length>0
-    ? movs.slice().reverse().slice(0,15).map(function(m){
-        var sinal=m.tipo==='entrada'?'+':'−';
-        var cor=m.tipo==='entrada'?'var(--gtx)':'var(--rtx)';
-        return '<div class="ah"><div style="display:flex;justify-content:space-between"><div style="font-size:13px;font-weight:500">'+m.motivo+'</div><strong style="color:'+cor+'">'+sinal+m.qtd+(ins.unidade?' '+ins.unidade:'')+'</strong></div>'
-          +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(m.data).toLocaleDateString('pt-BR')+(m.resp?' · '+m.resp:'')+'</div>'
-          +(m.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+m.obs+'</div>':'')+'</div>';
-      }).join('')
-    : '<div class="empty" style="padding:22px"><i class="ti ti-arrows-exchange"></i><div class="et" style="font-size:13px">Sem movimentações</div></div>';
+  var reqs=DB.get('requisicoes')||[];
+  var vinculado=reqs.some(function(r){ return r.insumo===ins.nome; });
   document.getElementById('dInsB').innerHTML=
     '<div class="trow" style="margin-bottom:13px">'+matTag(ins.matriz)+critBadge(ins.critici)+'<span class="chip">'+(ins.tipo||'—')+'</span></div>'
-    +'<div class="mets" style="margin-bottom:11px">'
-    +'<div class="met"><div class="ml">Estoque atual</div><div class="mv" style="color:'+est.cor+'">'+(ins.estoqueAtual!=null?ins.estoqueAtual:'—')+'</div><div class="ms">'+(ins.unidade||'')+' · '+est.label+'</div></div>'
-    +'<div class="met"><div class="ml">Estoque mínimo</div><div class="mv">'+(ins.estoqueMinimo!=null?ins.estoqueMinimo:'—')+'</div><div class="ms">ponto de pedido</div></div>'
-    +'</div>'
-    +'<div style="display:flex;gap:8px;margin-bottom:13px">'
-    +'<button class="btn btp btf" onclick="abrirMovEstoque('+realIdx+',\'entrada\')"><i class="ti ti-arrow-down"></i>Entrada</button>'
-    +'<button class="btn btd btf" onclick="abrirMovEstoque('+realIdx+',\'saida\')"><i class="ti ti-arrow-up"></i>Saída</button>'
-    +'</div>'
     +'<div class="card" style="margin-bottom:11px">'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Especificação</div><div class="iv" style="font-size:12px">'+(ins.spec||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Fornecedor pref.</div><div class="iv">'+(ins.forn||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">E-mail fornecedor</div><div class="iv" style="font-size:12px">'+(ins.fornEmail||'—')+'</div></div>'
-    +'<div class="ir" style="padding:10px 14px"><div class="ik">Validade mínima</div><div class="iv">'+(ins.validade?ins.validade+' meses':'—')+'</div></div>'
-    +'<div class="ir" style="padding:10px 14px"><div class="ik">Validade do lote</div><div class="iv">'+valMinHtml+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Código</div><div class="iv">'+(ins.codigo||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Cadastrado em</div><div class="iv">'+new Date(ins.criadoEm).toLocaleDateString('pt-BR')+'</div></div>'
     +'</div>'
     +(ins.obs?'<div style="background:var(--bg2);border-radius:var(--r);padding:11px 12px;font-size:13px;color:var(--tx2);margin-bottom:12px">'+ins.obs+'</div>':'')
-    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Movimentações de estoque</div>'
-    +'<div class="card" style="margin-bottom:13px">'+movHtml+'</div>'
-    +'<div style="display:flex;gap:8px">'
-    +'<button class="btn btp btf" onclick="reqDoInsumo(\''+encodeURIComponent(JSON.stringify(ins))+'\')"><i class="ti ti-send"></i>Requisitar</button>'
-    +'<button class="btn bto btf" onclick="editarIns('+realIdx+')"><i class="ti ti-edit"></i>Editar</button>'
-    +'</div>';
+    +(vinculado?'<div class="alert" style="background:var(--abg);color:var(--atx);border:0.5px solid #FAC775;margin-bottom:12px"><i class="ti ti-info-circle"></i><div>Vinculado a pedido(s) de compra — não pode ser excluído.</div></div>':'')
+    +'<button class="btn btp btf" style="margin-bottom:8px" onclick="reqDoInsumo(\''+encodeURIComponent(JSON.stringify(ins))+'\')"><i class="ti ti-send"></i>Requisitar este insumo</button>'
+    +(vinculado?'<button class="btn btd btf" disabled style="opacity:.5"><i class="ti ti-trash"></i>Excluir insumo</button>':'<button class="btn btd btf" onclick="excluirIns('+idx+')"><i class="ti ti-trash"></i>Excluir insumo</button>');
   abrirDetalhe('dIns');
 }
 
-function abrirMovEstoque(idx,tipo){
-  var ins=(DB.get('insumos')||[])[idx]; if(!ins) return;
-  sv('estIdx',idx); sv('estTipo',tipo);
-  document.getElementById('shEstoqueTitulo').childNodes[0].textContent=(tipo==='entrada'?'Registrar entrada':'Registrar saída')+' — estoque';
-  document.getElementById('estInfo').textContent=ins.nome+' · estoque atual: '+(ins.estoqueAtual!=null?ins.estoqueAtual:0)+(ins.unidade?' '+ins.unidade:'');
-  sv('estQtd',''); sv('estMotivo',tipo==='entrada'?'Recebimento de pedido':'Consumo em ensaio'); sv('estObs','');
-  var selR=document.getElementById('estResp');
-  if(selR){
-    var users=DB.get('usuarios')||[];
-    selR.innerHTML='<option value="">— Selecione —</option>';
-    users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
-    if(usuarioAtual) selR.value=usuarioAtual.nome;
-  }
-  document.getElementById('btnSalvarEst').innerHTML='<i class="ti ti-check"></i>Registrar '+(tipo==='entrada'?'entrada':'saída');
+function excluirIns(idx){
+  var insAll=DB.get('insumos')||[];
+  var ins=insAll[idx]; if(!ins) return;
+  var reqs=DB.get('requisicoes')||[];
+  var vinculado=reqs.some(function(r){ return r.insumo===ins.nome; });
+  if(vinculado){ toast('Não é possível excluir: insumo vinculado a pedido(s)'); return; }
+  if(!confirm('Excluir "'+ins.nome+'"? Esta ação não pode ser desfeita.')) return;
+  insAll.splice(idx,1);
+  DB.set('insumos',insAll);
   fecharDetalhe('dIns');
-  abrirSheet('shEstoque');
-}
-
-function salvarMovEstoque(){
-  var idx=parseInt(gv('estIdx'));
-  var tipo=gv('estTipo');
-  var qtd=parseFloat(gv('estQtd'));
-  if(isNaN(qtd)||qtd<=0){ toast('Informe uma quantidade válida'); return; }
-  var ins=DB.get('insumos')||[];
-  var item=ins[idx]; if(!item) return;
-  var atual=item.estoqueAtual!=null?item.estoqueAtual:0;
-  if(tipo==='saida'&&qtd>atual){
-    toast('Quantidade maior que o estoque disponível ('+atual+(item.unidade?' '+item.unidade:'')+')');
-    return;
-  }
-  item.estoqueAtual = tipo==='entrada' ? parseFloat((atual+qtd).toFixed(3)) : parseFloat((atual-qtd).toFixed(3));
-  if(!item.movimentos) item.movimentos=[];
-  item.movimentos.push({tipo:tipo,qtd:qtd,motivo:gv('estMotivo'),resp:gv('estResp'),obs:gv('estObs'),data:new Date().toISOString()});
-  ins[idx]=item;
-  DB.set('insumos',ins);
-  fecharSheet('shEstoque');
-  renderIns(); renderDash();
-  toast((tipo==='entrada'?'Entrada':'Saída')+' registrada — novo estoque: '+item.estoqueAtual+(item.unidade?' '+item.unidade:''));
-  setTimeout(function(){ verInsDetalhe(item,idx); },300);
+  renderIns(); atualizarCatalogSelect(); renderDash();
+  toast('Insumo excluído ✓');
 }
 
 function reqDoInsumo(enc){
@@ -1554,104 +1391,65 @@ function sincFornIns(idx){
   emailEl.value=opt.dataset.email||'';
 }
 
-// Critérios específicos de competência técnica (conforme planilha "BANCO DE DADOS AVALIAÇÃO")
-var CRITERIOS_ESPECIFICOS=[
-  'Qualificação térmica 0°C / 4°C / 6°C',
-  'Padrões de MRC de acordo com a ISO',
-  'Realizar calibração nas instalações da Éllu',
-  'Padrão de MR rastreado pela NIST',
-  'Calibração do termômetro capela nas faixas 10,00 / 20,00 / 30,00',
-  'Calibração do sensor de condutividade nas faixas 100 / 500 / 1048',
-  'Calibração do sensor de OD nas faixas 0,00 / 6,00 / 12,00',
-  'Calibração do sensor de ORP nas faixas 229 mV / 476 mV',
-  'Calibração do sensor de pH nas faixas 1,70 / 7,00 / 12,00',
-  'Calibração do termômetro nas faixas 0,0 / 15,0 / 30,00 / 45,00',
-  'Seguir critérios DOQ-CGCRE-033',
-  'Turbidímetro portátil, medição na faixa de 0 a 1000 NTU',
-  'Atender requisitos ISO 17034'
-];
-function renderFCritEspecBox(selecionados){
-  var box=document.getElementById('fCritEspecBox');
-  if(!box) return;
-  box.innerHTML='';
-  CRITERIOS_ESPECIFICOS.forEach(function(nome,i){
-    var div=document.createElement('div'); div.className='ci';
-    div.innerHTML='<input type="checkbox" id="fCrit'+i+'"'+(selecionados.indexOf(i)>=0?' checked':'')+'><span style="font-size:13px">'+nome+'</span>';
-    box.appendChild(div);
-  });
-}
-function getFCritEspecSelecionados(){
-  var sel=[];
-  CRITERIOS_ESPECIFICOS.forEach(function(_,i){ var e=document.getElementById('fCrit'+i); if(e&&e.checked) sel.push(i); });
-  return sel;
-}
-
-function novoForn(){
-  sv('fIdx','-1');
-  clr(['fNome','fCnpj','fEspec','fCont','fObs']);
-  sv('fMat',''); sv('fStat','Em qualificação (sem avaliação ainda)'); sv('fPer','Anual');
-  renderFCritEspecBox([]);
-  document.getElementById('shFornTitulo').childNodes[0].textContent='Novo fornecedor';
-  document.getElementById('fStatLabel').textContent='Status';
-  document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Cadastrar fornecedor';
-  abrirSheet('shForn');
-}
-function editarForn(idx){
-  var f=(DB.get('fornecedores')||[])[idx]; if(!f) return;
-  document.getElementById('fIdx').value=idx;
-  sv('fNome',f.nome||''); sv('fCnpj',f.cnpj||''); sv('fEspec',f.espec||''); sv('fMat',f.matriz||'');
-  var statusTxt = f.status ? f.status+(f.mediaTotal!=null?' (média total '+f.mediaTotal+'/10)':'') : 'Em qualificação (sem avaliação ainda)';
-  sv('fStat',statusTxt); sv('fCont',f.contato||''); sv('fPer',f.period||'Anual'); sv('fObs',f.obs||'');
-  renderFCritEspecBox(f.criteriosEspecificos||[]);
-  document.getElementById('shFornTitulo').childNodes[0].textContent='Editar fornecedor';
-  document.getElementById('fStatLabel').textContent='Status (automático — conforme avaliação)';
-  document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Salvar alterações';
-  fecharDetalhe('dForn');
-  abrirSheet('shForn');
-}
 function salvarForn(){
   var nome=gv('fNome').trim();
   if(!nome){ toast('Preencha a razão social'); return; }
-  var idx=parseInt(gv('fIdx'));
-  var criteriosEspecificos=getFCritEspecSelecionados();
-  var forns=DB.get('fornecedores')||[];
-  if(!isNaN(idx)&&idx>=0&&forns[idx]){
-    var f=forns[idx];
-    f.nome=nome; f.cnpj=gv('fCnpj'); f.espec=gv('fEspec'); f.matriz=gv('fMat');
-    f.contato=gv('fCont'); f.period=gv('fPer'); f.obs=gv('fObs'); f.criteriosEspecificos=criteriosEspecificos;
-    forns[idx]=f;
-    DB.set('fornecedores',forns);
-    recalcularFornecedor(idx);
-    toast(nome+' atualizado ✓');
-  } else {
-    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:null,contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),criteriosEspecificos:criteriosEspecificos,nota:0,criadoEm:new Date().toISOString()});
-    toast(nome+' cadastrado ✓');
-  }
+  DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:gv('fStat'),contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,avaliacoes:[],criadoEm:new Date().toISOString()});
   fecharSheet('shForn');
-  clr(['fNome','fCnpj','fEspec','fCont','fObs']); sv('fIdx','-1');
+  clr(['fNome','fCnpj','fEspec','fCont','fObs']);
   renderForn(); renderDash(); atualizarFornSelect(); atualizarFornSelectReq();
+  toast(nome+' cadastrado ✓');
 }
 
-function renderForn(){
-  var forns=DB.get('fornecedores')||[];
+function renderForn(busca, ordem){
+  var fornsAll=DB.get('fornecedores')||[];
   var lista=document.getElementById('liForn');
   lista.querySelectorAll('.li').forEach(function(e){ e.remove(); });
   var empty=document.getElementById('eForn');
-  if(forns.length===0){ empty.style.display=''; return; }
-  empty.style.display='none';
-  forns.forEach(function(f,idx){
+  var b=busca!==undefined?busca:fornBuscaAtual;
+  var o=ordem!==undefined?ordem:fornOrdenacaoAtual;
+  fornBuscaAtual=b; fornOrdenacaoAtual=o;
+  var data=fornsAll.map(function(item,idx){ return {item:item,idx:idx}; }).filter(function(x){
+    if(b && JSON.stringify(x.item).toLowerCase().indexOf(b.toLowerCase())<0) return false;
+    return true;
+  });
+  data=ordenarFornecedores(data,o);
+  empty.style.display=data.length===0?'':'none';
+  data.forEach(function(x){
+    var f=x.item, idx=x.idx;
     var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
-    var nota=(f.mediaTotal!=null)?f.mediaTotal.toFixed(2):'—';
-    var reqs=DB.get('requisicoes')||[];
-    var nAv=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; }).length;
+    var nota=f.nota?f.nota.toFixed(1):'—';
+    var nAv=f.avaliacoes?f.avaliacoes.length:0;
     var el=document.createElement('div'); el.className='li';
     el.innerHTML='<div class="lic" style="background:var(--gbg);color:var(--gtx);font-size:13px;font-weight:700">'+ini+'</div>'
       +'<div class="lib"><div class="lit">'+f.nome+'</div><div class="lis">'+(f.espec||f.matriz||'—')+'</div>'
-      +'<div style="margin-top:3px;font-size:10.5px;color:var(--tx3)">'+(nota!=='—'?'Média total '+nota+'/10':'Sem avaliação')+' · '+nAv+' pedido'+(nAv!==1?'s':'')+' aval.</div></div>'
+      +'<div style="margin-top:3px;font-size:10.5px;color:var(--tx3)">'+(nota!=='—'?'⭐ '+nota+'/5':'Sem avaliação')+' · '+nAv+' aval.</div></div>'
       +'<div class="lir">'+fornStatus(f.status)+'<i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px;margin-top:5px"></i></div>';
-    (function(i){ el.onclick=function(){ verFornDetalhe(i); }; })(idx);
+    (function(realIdx){ el.onclick=function(){ verFornDetalhe(realIdx); }; })(idx);
     lista.appendChild(el);
   });
+}
+var fornBuscaAtual='';
+var fornOrdenacaoAtual='az';
+function buscarForn(q){ renderForn(q, fornOrdenacaoAtual); }
+function ordenarFornUI(v){ renderForn(fornBuscaAtual, v); }
+function ordenarFornecedores(data, order){
+  var arr=data.slice();
+  switch(order){
+    case 'za': arr.sort(function(a,b){ return (b.item.nome||'').localeCompare(a.item.nome||''); }); break;
+    case 'recentes': arr.sort(function(a,b){ return new Date(b.item.criadoEm)-new Date(a.item.criadoEm); }); break;
+    case 'antigos': arr.sort(function(a,b){ return new Date(a.item.criadoEm)-new Date(b.item.criadoEm); }); break;
+    case 'nota': arr.sort(function(a,b){ return (b.item.nota||0)-(a.item.nota||0); }); break;
+    case 'status':
+      arr.sort(function(a,b){
+        var sa=a.item.status==='Aprovado'?0:1, sb=b.item.status==='Aprovado'?0:1;
+        return sa-sb;
+      });
+      break;
+    default:
+      arr.sort(function(a,b){ return (a.item.nome||'').localeCompare(b.item.nome||''); });
+  }
+  return arr;
 }
 
 function verFornDetalhe(idx){
@@ -1660,59 +1458,35 @@ function verFornDetalhe(idx){
   document.getElementById('dFornT').textContent=f.nome;
   document.getElementById('dFornS').textContent=(f.espec||f.matriz||'—');
   var ini=f.nome.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
-  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia','Atender especificações da Matriz de Competência'];
-  var critIniHtml='';
-  if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
-    critIniHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">FO.008 — Avaliação inicial</div>'
+  var nota=f.nota?f.nota.toFixed(1):'—';
+  var critNomes=['Qualidade dos insumos','Conformidade documental','Cumprimento de prazos','Tratamento de NC','Capacidade técnica'];
+  var ul=f.avaliacoes&&f.avaliacoes.length>0?f.avaliacoes[f.avaliacoes.length-1]:null;
+  var critHtml='';
+  if(ul&&ul.scores){
+    critHtml='<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Última avaliação — critérios</div>'
       +'<div class="card" style="padding:12px 14px;margin-bottom:11px">';
-    critNomesIni.forEach(function(n,i){
-      var s=f.avaliacaoInicial.scores[i];
-      if(s==null){ critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong style="color:var(--tx3)">NA</strong></div></div>'; return; }
-      critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/10</strong></div>'
-        +'<div class="pb"><div class="pbv" style="width:'+(s*10)+'%;'+(s<7?'background:#EF9F27':'')+'"></div></div></div>';
+    critNomes.forEach(function(n,i){
+      var s=ul.scores[i]||0;
+      critHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/5</strong></div>'
+        +'<div class="pb"><div class="pbv" style="width:'+(s*20)+'%;'+(s<3?'background:#EF9F27':'')+'"></div></div></div>';
     });
-    if(f.avaliacaoInicial.scoresEspecificos&&(f.criteriosEspecificos||[]).length>0){
-      (f.criteriosEspecificos||[]).forEach(function(ci){
-        var s=f.avaliacaoInicial.scoresEspecificos[ci];
-        var n=CRITERIOS_ESPECIFICOS[ci];
-        if(s==null){ critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong style="color:var(--tx3)">NA</strong></div></div>'; return; }
-        critIniHtml+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+n+'</span><strong>'+s+'/10</strong></div>'
-          +'<div class="pb"><div class="pbv" style="width:'+(s*10)+'%;'+(s<7?'background:#EF9F27':'')+'"></div></div></div>';
-      });
-    }
-    critIniHtml+='</div>';
+    critHtml+='</div>';
   }
-  var reqs=DB.get('requisicoes')||[];
-  var avaliacoesPedidos=[];
-  reqs.forEach(function(r){
-    if(r.forn!==f.nome) return;
-    if(r.avaliacaoForn) avaliacoesPedidos.push({label:r.id+' — '+r.insumo, a:r.avaliacaoForn});
-    if(r.itens&&r.itens.length){
-      r.itens.forEach(function(it){
-        if(it.avaliacaoForn) avaliacoesPedidos.push({label:r.id+' — '+it.nome+' <span class="chip">contrato</span>', a:it.avaliacaoForn});
-      });
-    }
-  });
   var avalHtml='';
-  if(avaliacoesPedidos.length>0){
-    avaliacoesPedidos.slice().reverse().forEach(function(item){
-      var a=item.a;
-      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+item.label+'</div>'
-        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Média '+a.media+'/10'+(a.resp?' · '+a.resp:'')+'</div>'
+  if(f.avaliacoes&&f.avaliacoes.length>0){
+    f.avaliacoes.slice().reverse().forEach(function(a){
+      avalHtml+='<div class="ah"><div style="font-size:13px;font-weight:500">'+a.decisao+'</div>'
+        +'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+new Date(a.data).toLocaleDateString('pt-BR')+' · Nota '+a.nota+'/5</div>'
         +(a.obs?'<div style="font-size:12px;color:var(--tx2);margin-top:3px">'+a.obs+'</div>':'')+'</div>';
     });
   } else {
-    avalHtml='<div class="empty" style="padding:22px"><i class="ti ti-star"></i><div class="et" style="font-size:13px">Sem avaliações de pedidos (FO.061)</div></div>';
+    avalHtml='<div class="empty" style="padding:22px"><i class="ti ti-star"></i><div class="et" style="font-size:13px">Sem avaliações</div></div>';
   }
   document.getElementById('dFornB').innerHTML=
     '<div style="display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:var(--rl);padding:12px;margin-bottom:12px">'
     +'<div style="width:46px;height:46px;background:var(--gbg);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gtx)">'+ini+'</div>'
-    +'<div><div style="font-size:15px;font-weight:700">'+f.nome+'</div>'+fornStatus(f.status)+'</div></div>'
-    +'<div class="mets" style="margin-bottom:12px">'
-    +'<div class="met"><div class="ml">Avaliação Inicial (FO.008)</div><div class="mv">'+(f.mediaInicial!=null?f.mediaInicial:'—')+'</div><div class="ms">de 10</div></div>'
-    +'<div class="met"><div class="ml">Média Monitoramento (FO.061)</div><div class="mv">'+(f.mediaMonitoramento!=null?f.mediaMonitoramento:'—')+'</div><div class="ms">'+avaliacoesPedidos.length+' pedido'+(avaliacoesPedidos.length!==1?'s':'')+' avaliado'+(avaliacoesPedidos.length!==1?'s':'')+'</div></div>'
-    +'<div class="met" style="grid-column:1/-1"><div class="ml">Média Total</div><div class="mv" style="color:'+(f.mediaTotal!=null&&f.mediaTotal>=7?'var(--gtx)':f.mediaTotal!=null?'var(--rtx)':'inherit')+'">'+(f.mediaTotal!=null?f.mediaTotal:'—')+'</div><div class="ms">corte: ≥ 7 Aprovado · &lt; 7 Reprovado</div></div>'
-    +'</div>'
+    +'<div><div style="font-size:15px;font-weight:700">'+f.nome+'</div>'+fornStatus(f.status)
+    +(nota!=='—'?'<div style="font-size:11px;color:var(--tx3);margin-top:3px">⭐ '+nota+'/5 · '+(f.avaliacoes?f.avaliacoes.length:0)+' avaliações</div>':'')+'</div></div>'
     +'<div class="card" style="margin-bottom:11px">'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">CNPJ</div><div class="iv">'+(f.cnpj||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Especialidade</div><div class="iv">'+(f.espec||'—')+'</div></div>'
@@ -1720,131 +1494,59 @@ function verFornDetalhe(idx){
     +'<div class="ir" style="padding:10px 14px"><div class="ik">Contato</div><div class="iv">'+(f.contato||'—')+'</div></div>'
     +'<div class="ir" style="padding:10px 14px;border-bottom:none"><div class="ik">Reavaliação</div><div class="iv">'+(f.period||'Anual')+'</div></div>'
     +'</div>'
-    +critIniHtml
-    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">FO.061 — Avaliações por pedido</div>'
+    +critHtml
+    +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de avaliações</div>'
     +'<div class="card" style="margin-bottom:13px">'+avalHtml+'</div>'
-    +'<div style="display:flex;gap:8px;margin-bottom:8px">'
-    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>'+(f.avaliacaoInicial?'Editar avaliação inicial':'Avaliação inicial (FO.008)')+'</button>'
-    +'<button class="btn bto btf" onclick="editarForn('+idx+')"><i class="ti ti-edit"></i>Editar</button>'
-    +'</div>'
-    +(reqs.some(function(r){ return r.forn===f.nome; })
-      ? '<div class="alert" style="background:var(--xbg);color:var(--xtx)"><i class="ti ti-lock"></i><div>Este fornecedor possui pedidos de compra vinculados e não pode ser excluído.</div></div>'
-      : '<button class="btn btd btf" onclick="excluirForn('+idx+')"><i class="ti ti-trash"></i>Excluir fornecedor</button>');
+    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>Nova avaliação</button>';
   abrirDetalhe('dForn');
 }
-function excluirForn(idx){
-  var forns=DB.get('fornecedores')||[];
-  var f=forns[idx]; if(!f) return;
-  var reqs=DB.get('requisicoes')||[];
-  if(reqs.some(function(r){ return r.forn===f.nome; })){
-    toast('Não é possível excluir: há pedidos vinculados a este fornecedor');
-    return;
-  }
-  if(!confirm('Excluir definitivamente o fornecedor "'+f.nome+'"? Essa ação não pode ser desfeita.')) return;
-  forns.splice(idx,1);
-  DB.set('fornecedores',forns);
-  fecharDetalhe('dForn');
-  renderForn(); renderDash(); atualizarFornSelect(); atualizarFornSelectReq();
-  toast('Fornecedor excluído ✓');
-}
 
+var aScores=[0,0,0,0,0];
 function prepAval(idx){
   document.getElementById('avalIdx').value=idx;
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
   document.getElementById('avalInfo').textContent=f.nome+(f.espec?' · '+f.espec:'');
-  for(var i=0;i<8;i++){
-    var v=(f.avaliacaoInicial&&f.avaliacaoInicial.scores&&f.avaliacaoInicial.scores[i]!=null)?f.avaliacaoInicial.scores[i]:'';
-    sv('av'+i, v);
+  aScores=[0,0,0,0,0];
+  for(var i=0;i<5;i++){
+    document.getElementById('sv'+i).textContent='—';
+    var box=document.getElementById('sb'+i); box.innerHTML='';
+    for(var v=1;v<=5;v++){
+      var b=document.createElement('button'); b.className='sb3'; b.textContent=v;
+      (function(ci,cv){ b.onclick=function(){ setAvalScore(ci,cv); }; })(i,v);
+      box.appendChild(b);
+    }
   }
-  // Critérios específicos deste fornecedor
-  var especIdx=f.criteriosEspecificos||[];
-  var box=document.getElementById('avalEspecCard');
-  var boxWrap=document.getElementById('avalEspecBox');
-  box.innerHTML='';
-  if(especIdx.length>0){
-    boxWrap.style.display='';
-    especIdx.forEach(function(ci){
-      var prevVal=(f.avaliacaoInicial&&f.avaliacaoInicial.scoresEspecificos&&f.avaliacaoInicial.scoresEspecificos[ci]!=null)?f.avaliacaoInicial.scoresEspecificos[ci]:'';
-      var div=document.createElement('div'); div.className='ah';
-      div.innerHTML='<div style="font-size:13px;margin-bottom:6px">'+CRITERIOS_ESPECIFICOS[ci]+'</div><input type="number" id="avEsp'+ci+'" min="0" max="10" step="0.1" placeholder="0–10 ou vazio = NA" value="'+prevVal+'" oninput="calcAvalIni()">';
-      box.appendChild(div);
-    });
-  } else {
-    boxWrap.style.display='none';
-  }
-  sv('avalObs', f.avaliacaoInicial?f.avaliacaoInicial.obs:'');
-  sv('avalProx', f.avaliacaoInicial?f.avaliacaoInicial.proxima:'');
-  calcAvalIni();
+  sv('avalObs',''); sv('avalProx','');
+  document.getElementById('notaG').textContent='—';
   fecharDetalhe('dForn');
   abrirSheet('shAval');
 }
 
-function calcAvalIni(){
-  var vals=[];
-  for(var i=0;i<8;i++){ var raw=gv('av'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
-  var idx=parseInt(document.getElementById('avalIdx').value);
-  var f=(DB.get('fornecedores')||[])[idx];
-  var especIdx=(f&&f.criteriosEspecificos)||[];
-  especIdx.forEach(function(ci){
-    var el=document.getElementById('avEsp'+ci); if(!el) return;
-    var raw=el.value.trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); }
-  });
-  var elG=document.getElementById('notaG');
-  if(vals.length===0){ elG.textContent='—'; return null; }
-  var med=vals.reduce(function(a,b){return a+b;},0)/vals.length;
-  elG.textContent=med.toFixed(2);
-  return med;
+function setAvalScore(ci,cv){
+  aScores[ci]=cv;
+  document.getElementById('sv'+ci).textContent=cv+'/5';
+  var btns=document.querySelectorAll('#sb'+ci+' .sb3');
+  for(var j=0;j<btns.length;j++) btns[j].classList.toggle('on',j+1===cv);
+  var vals=aScores.filter(function(v){ return v>0; });
+  if(vals.length>0){ document.getElementById('notaG').textContent=(vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1); }
 }
 
 function salvarAval(){
   var idx=parseInt(document.getElementById('avalIdx').value);
-  var med=calcAvalIni();
-  if(med===null){ toast('Atribua pelo menos uma nota'); return; }
-  var scores=[]; for(var i=0;i<8;i++){ var raw=gv('av'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
+  if(aScores.every(function(v){ return v===0; })){ toast('Atribua pelo menos uma nota'); return; }
   var forns=DB.get('fornecedores')||[];
   var f=forns[idx];
-  var scoresEspecificos={};
-  (f.criteriosEspecificos||[]).forEach(function(ci){
-    var el=document.getElementById('avEsp'+ci); if(!el) return;
-    var raw=el.value.trim(); scoresEspecificos[ci]=raw===''?null:parseFloat(raw);
-  });
-  f.avaliacaoInicial={data:new Date().toISOString(),scores:scores,scoresEspecificos:scoresEspecificos,media:parseFloat(med.toFixed(2)),obs:gv('avalObs'),proxima:gv('avalProx')};
-  forns[idx]=f;
-  DB.set('fornecedores',forns);
-  recalcularFornecedor(idx);
+  var vals=aScores.filter(function(v){ return v>0; });
+  var med=parseFloat((vals.reduce(function(a,b){ return a+b; },0)/vals.length).toFixed(1));
+  var aval={data:new Date().toISOString(),scores:aScores.slice(),nota:med,decisao:gv('avalDec'),obs:gv('avalObs'),proxima:gv('avalProx')};
+  if(!f.avaliacoes) f.avaliacoes=[];
+  f.avaliacoes.push(aval); f.nota=med; f.status=aval.decisao;
+  forns[idx]=f; DB.set('fornecedores',forns);
+  fecharSheet('shAval'); aScores=[0,0,0,0,0];
   renderForn(); renderDash();
-  fecharSheet('shAval');
-  toast('Avaliação inicial salva — '+med.toFixed(2)+'/10 ✓');
+  toast('Avaliação salva — nota '+med+'/5 ✓');
   setTimeout(function(){ verFornDetalhe(idx); },300);
-}
-
-// Recalcula Média Monitoramento (FO.061) e Média Total do fornecedor, define status Aprovado/Reprovado (corte: 7)
-function recalcularFornecedor(idx){
-  var forns=DB.get('fornecedores')||[];
-  var f=forns[idx]; if(!f) return;
-  var reqs=DB.get('requisicoes')||[];
-  var medias=[];
-  reqs.forEach(function(r){
-    if(r.forn!==f.nome) return;
-    if(r.avaliacaoForn&&typeof r.avaliacaoForn.media==='number') medias.push(r.avaliacaoForn.media);
-    if(r.itens&&r.itens.length){
-      r.itens.forEach(function(it){
-        if(it.avaliacaoForn&&typeof it.avaliacaoForn.media==='number') medias.push(it.avaliacaoForn.media);
-      });
-    }
-  });
-  var mediaMonitoramento = medias.length>0 ? medias.reduce(function(a,b){return a+b;},0)/medias.length : null;
-  var mediaInicial = (f.avaliacaoInicial&&typeof f.avaliacaoInicial.media==='number') ? f.avaliacaoInicial.media : null;
-  var partes=[]; if(mediaInicial!==null) partes.push(mediaInicial); if(mediaMonitoramento!==null) partes.push(mediaMonitoramento);
-  var mediaTotal = partes.length>0 ? partes.reduce(function(a,b){return a+b;},0)/partes.length : null;
-  f.mediaInicial = mediaInicial;
-  f.mediaMonitoramento = mediaMonitoramento!==null?parseFloat(mediaMonitoramento.toFixed(2)):null;
-  f.mediaTotal = mediaTotal!==null?parseFloat(mediaTotal.toFixed(2)):null;
-  f.nota = f.mediaTotal;
-  if(mediaTotal!==null){ f.status = mediaTotal>=7 ? 'Aprovado' : 'Reprovado'; }
-  forns[idx]=f;
-  DB.set('fornecedores',forns);
 }
 
 // ============================================================
@@ -2201,87 +1903,6 @@ function canvasToDataURL(id){
 // ============================================================
 // PDF & EMAIL
 // ============================================================
-function gerarRelatorioFornecedores(){
-  var forns=(DB.get('fornecedores')||[]).filter(function(f){ return f.status==='Aprovado'; });
-  var reqs=DB.get('requisicoes')||[];
-  var dataEmissao=new Date().toLocaleDateString('pt-BR');
-  var critNomesIni=['Qualidade','Localização','Política de entrega','Preço','Prazo certificados','Assistência técnica','Garantia','Atender espec. Matriz de Competência'];
-
-  var corpo='';
-  if(forns.length===0){
-    corpo='<p style="color:#666;font-size:13px">Nenhum fornecedor aprovado no momento.</p>';
-  } else {
-    forns.forEach(function(f){
-      var avals=reqs.filter(function(r){ return r.forn===f.nome && r.avaliacaoForn; });
-      var iniHtml='<span style="color:#999">Sem avaliação inicial registrada</span>';
-      if(f.avaliacaoInicial&&f.avaliacaoInicial.scores){
-        var nomesCols=critNomesIni.slice();
-        var valoresCols=f.avaliacaoInicial.scores.slice();
-        (f.criteriosEspecificos||[]).forEach(function(ci){
-          nomesCols.push(CRITERIOS_ESPECIFICOS[ci]);
-          var sv=(f.avaliacaoInicial.scoresEspecificos&&f.avaliacaoInicial.scoresEspecificos[ci]!=null)?f.avaliacaoInicial.scoresEspecificos[ci]:null;
-          valoresCols.push(sv);
-        });
-        iniHtml='<table class="mini"><tr>'+nomesCols.map(function(n){return '<th>'+n+'</th>';}).join('')+'</tr><tr>'
-          +valoresCols.map(function(s){ return '<td>'+(s==null?'NA':s)+'</td>'; }).join('')+'</tr></table>';
-      }
-      var pedidosHtml='<p style="color:#999;font-size:11.5px;margin:4px 0">Nenhum pedido avaliado (FO.061)</p>';
-      if(avals.length>0){
-        pedidosHtml='<table class="mini2"><tr><th>Pedido</th><th>Insumo</th><th>Data</th><th>Avaliador</th><th>Média</th></tr>'
-          +avals.map(function(r){
-            return '<tr><td>'+r.id+'</td><td>'+r.insumo+'</td><td>'+new Date(r.avaliacaoForn.data).toLocaleDateString('pt-BR')+'</td><td>'+(r.avaliacaoForn.resp||'—')+'</td><td><strong>'+r.avaliacaoForn.media+'/10</strong></td></tr>';
-          }).join('')+'</table>';
-      }
-      corpo+='<div class="forn-block">'
-        +'<div class="forn-head"><div><div class="forn-nome">'+f.nome+'</div><div class="forn-sub">'+(f.espec||f.matriz||'—')+(f.cnpj?' · '+f.cnpj:'')+'</div></div>'
-        +'<div class="forn-medias">'
-        +'<div class="mbox"><span>Inicial</span><strong>'+(f.mediaInicial!=null?f.mediaInicial:'—')+'</strong></div>'
-        +'<div class="mbox"><span>Monitoramento</span><strong>'+(f.mediaMonitoramento!=null?f.mediaMonitoramento:'—')+'</strong></div>'
-        +'<div class="mbox total"><span>Total</span><strong>'+(f.mediaTotal!=null?f.mediaTotal:'—')+'</strong></div>'
-        +'</div></div>'
-        +'<div class="sec-title">FO.008 — Avaliação inicial</div>'+iniHtml
-        +'<div class="sec-title">FO.061 — Avaliações por pedido ('+avals.length+')</div>'+pedidosHtml
-        +'</div>';
-    });
-  }
-
-  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:32px}'
-    +'.logo{display:flex;align-items:center;gap:12px;margin-bottom:6px}'
-    +'.logo-icon{width:44px;height:44px;background:#0F6E56;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}'
-    +'.logo-name{font-size:20px;font-weight:700;color:#0F6E56}.logo-sub{font-size:11px;color:#666}'
-    +'.divider{border:none;border-top:2px solid #0F6E56;margin:14px 0}'
-    +'.titulo{font-size:17px;font-weight:700;margin-bottom:4px}.subtitulo{font-size:11px;color:#666;margin-bottom:18px}'
-    +'.forn-block{border:1px solid #ddd;border-radius:8px;padding:14px 16px;margin-bottom:16px;page-break-inside:avoid}'
-    +'.forn-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}'
-    +'.forn-nome{font-size:14px;font-weight:700;color:#0F6E56}.forn-sub{font-size:11px;color:#666;margin-top:2px}'
-    +'.forn-medias{display:flex;gap:8px}'
-    +'.mbox{background:#f6f6f4;border-radius:6px;padding:6px 10px;text-align:center;min-width:70px}'
-    +'.mbox span{display:block;font-size:9.5px;color:#777;text-transform:uppercase}'
-    +'.mbox strong{font-size:15px}'
-    +'.mbox.total{background:#E1F5EE;color:#085041}'
-    +'.sec-title{font-size:10.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 5px}'
-    +'table.mini{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:4px}'
-    +'table.mini th{background:#f0f0ee;padding:4px 6px;text-align:center;font-weight:600}'
-    +'table.mini td{padding:4px 6px;text-align:center;border:1px solid #eee}'
-    +'table.mini2{width:100%;border-collapse:collapse;font-size:11px}'
-    +'table.mini2 th{background:#0F6E56;color:#fff;padding:5px 8px;text-align:left}'
-    +'table.mini2 td{padding:5px 8px;border-bottom:1px solid #eee}'
-    +'.footer{margin-top:20px;padding-top:14px;border-top:1px solid #ddd;font-size:11px;color:#888;display:flex;justify-content:space-between}'
-    +'@media print{body{padding:20px}.forn-block{break-inside:avoid}}'
-    +'</style></head><body>'
-    +'<div class="logo"><div class="logo-icon">🌿</div><div><div class="logo-name">Éllu Ambiental</div><div class="logo-sub">ISO/IEC 17025:2017 — Gestão de Fornecedores</div></div></div>'
-    +'<hr class="divider">'
-    +'<div class="titulo">Relatório de Fornecedores Aprovados</div>'
-    +'<div class="subtitulo">Emitido em '+dataEmissao+' · '+forns.length+' fornecedor'+(forns.length!==1?'es':'')+' aprovado'+(forns.length!==1?'s':'')+' · Critério: Média Total ≥ 7 (FO.008 + FO.061)</div>'
-    +corpo
-    +'<div class="footer"><span>Éllu Ambiental · ISO/IEC 17025:2017 §6.6.2</span><span>Gerado em '+dataEmissao+'</span></div>'
-    +'</body></html>';
-  var win=window.open('','_blank','width=900,height=700');
-  win.document.write(html); win.document.close(); win.focus();
-  setTimeout(function(){ win.print(); },500);
-}
-
 function gerarPDF(idx){
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
@@ -2371,78 +1992,73 @@ function enviarEmail(idx){
 // ============================================================
 // AVALIAÇÃO DO FORNECEDOR POR PEDIDO
 // ============================================================
-function prepAvalFornPC(idx,itemIdx){
+var notaFornPC = 0;
+function prepAvalFornPC(idx){
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
-  var target = (itemIdx!=null) ? r.itens[itemIdx] : r;
   document.getElementById('avalFornPCIdx').value=idx;
-  document.getElementById('avalFornPCItemIdx').value=(itemIdx!=null?itemIdx:'');
-  document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+(itemIdx!=null?' · item: '+r.itens[itemIdx].nome:' ('+r.insumo+')');
-  for(var i=0;i<9;i++){
-    var v=(target.avaliacaoForn&&target.avaliacaoForn.scores&&target.avaliacaoForn.scores[i]!=null)?target.avaliacaoForn.scores[i]:'';
-    sv('afpc'+i, v);
-  }
-  sv('avalFornPCObs', target.avaliacaoForn?target.avaliacaoForn.obs:'');
-  calcAvalFornPC();
+  document.getElementById('avalFornPCInfo').textContent=r.forn+' — pedido '+r.id+' ('+r.insumo+')';
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); if(e) e.checked=false; });
+  notaFornPC=0;
+  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('avalFornPCNotaTxt').textContent='—';
+  sv('avalFornPCRes','Aprovado'); sv('avalFornPCObs','');
   var selR=document.getElementById('avalFornPCResp');
   if(selR){
     var users=DB.get('usuarios')||[];
     selR.innerHTML='<option value="">— Selecione —</option>';
     users.forEach(function(u){ var o=document.createElement('option'); o.value=u.nome; o.textContent=u.nome; selR.appendChild(o); });
-    selR.value = (target.avaliacaoForn&&target.avaliacaoForn.resp) ? target.avaliacaoForn.resp : (usuarioAtual?usuarioAtual.nome:'');
+    if(usuarioAtual) selR.value=usuarioAtual.nome;
   }
   fecharDetalhe('dReq');
   abrirSheet('shAvalFornPC');
 }
 
-function calcAvalFornPC(){
-  var vals=[];
-  for(var i=0;i<9;i++){ var raw=gv('afpc'+i).trim(); if(raw!==''){ var n=parseFloat(raw); if(!isNaN(n)) vals.push(n); } }
-  var el=document.getElementById('avalFornPCNotaTxt');
-  if(vals.length===0){ el.textContent='—'; return null; }
-  var med=vals.reduce(function(a,b){return a+b;},0)/vals.length;
-  el.textContent=med.toFixed(2);
-  return med;
+function setNotaFornPC(n){
+  notaFornPC=n;
+  document.querySelectorAll('#avalFornPCStars .sb3').forEach(function(b,i){ b.classList.toggle('on',i<n); });
+  var labels=['','Insatisfatório','Ruim','Regular','Bom','Excelente'];
+  document.getElementById('avalFornPCNotaTxt').textContent=n+'/5 — '+labels[n];
 }
 
 function salvarAvalFornPC(){
   var idx=parseInt(document.getElementById('avalFornPCIdx').value);
-  var itemIdxRaw=document.getElementById('avalFornPCItemIdx').value;
-  var itemIdx=itemIdxRaw!==''?parseInt(itemIdxRaw):null;
   var reqs=DB.get('requisicoes')||[];
   var r=reqs[idx]; if(!r) return;
-  var med=calcAvalFornPC();
-  if(med===null){ toast('Atribua pelo menos uma nota'); return; }
-  var scores=[]; for(var i=0;i<9;i++){ var raw=gv('afpc'+i).trim(); scores.push(raw===''?null:parseFloat(raw)); }
-  var avaliacao={
+  if(notaFornPC===0){ toast('Atribua uma nota ao fornecedor'); return; }
+  var cks=[]; var ok=0;
+  [1,2,3,4,5,6].forEach(function(i){ var e=document.getElementById('afpc'+i); var v=e?e.checked:false; cks.push(v); if(v) ok++; });
+  r.avaliacaoForn={
     forn:r.forn,
-    scores:scores,
-    media:parseFloat(med.toFixed(2)),
+    resultado:gv('avalFornPCRes'),
+    nota:notaFornPC,
+    criterios:cks,
+    criteriosOK:ok,
     obs:gv('avalFornPCObs'),
     resp:gv('avalFornPCResp'),
     data:new Date().toISOString()
   };
-  if(itemIdx!=null){
-    r.itens[itemIdx].avaliacaoForn=avaliacao;
-    r.itens[itemIdx].status='Recebido';
-    r.itens[itemIdx].dataRetorno=new Date().toISOString();
-    if(r.itens.every(function(it){ return it.status==='Recebido'; })){
-      if(!r.historico) r.historico=[];
-      r.historico.push({acao:'Contrato concluído — todos os itens recebidos e avaliados',data:new Date().toISOString()});
-      r.status='concluido';
-    }
-  } else {
-    r.avaliacaoForn=avaliacao;
-  }
   reqs[idx]=r;
   DB.set('requisicoes',reqs);
-  // Recalcular médias e status do fornecedor (FO.008 + FO.061 -> Média Total, corte 7)
+  // Registrar também no cadastro do fornecedor
   var forns=DB.get('fornecedores')||[];
   var fi=forns.findIndex(function(f){ return f.nome===r.forn; });
-  if(fi>=0) recalcularFornecedor(fi);
+  if(fi>=0){
+    if(!forns[fi].avaliacoes) forns[fi].avaliacoes=[];
+    forns[fi].avaliacoes.push({
+      data:r.avaliacaoForn.data,
+      scores:[notaFornPC,notaFornPC,notaFornPC,notaFornPC,notaFornPC],
+      nota:notaFornPC,
+      decisao:gv('avalFornPCRes'),
+      obs:'Pedido '+r.id+' — '+(gv('avalFornPCObs')||''),
+      pedidoId:r.id
+    });
+    forns[fi].nota=notaFornPC;
+    forns[fi].status=gv('avalFornPCRes');
+    DB.set('fornecedores',forns);
+  }
   fecharSheet('shAvalFornPC');
-  renderForn(); renderReqs();
-  toast('Avaliação salva — média '+med.toFixed(2)+'/10 ✓');
+  toast('Fornecedor avaliado — nota '+notaFornPC+'/5 ✓');
   setTimeout(function(){ verReqDetalhe(idx); },300);
 }
 function prepAvalPC(idx){
