@@ -295,7 +295,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   </select></div>
   <div class="alert ai"><i class="ti ti-info-circle"></i><div>Apenas fornecedores <strong>Aprovados</strong> podem ser usados em pedidos — ISO 17025 §6.6.2.</div></div>
   <div class="card" id="liForn"><div class="empty" id="eForn"><i class="ti ti-building-store"></i><div class="et">Nenhum fornecedor</div><div class="es">Toque + para cadastrar</div></div></div>
-  <button class="fab" onclick="abrirSheet('shForn')"><i class="ti ti-plus"></i></button>
+  <button class="fab" onclick="novoForn()"><i class="ti ti-plus"></i></button>
 </div>
 
 <!-- NC -->
@@ -433,8 +433,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- SHEET: Novo Fornecedor -->
 <div class="sbg" id="bgForn" onclick="fecharSheet('shForn')">
 <div class="sh" id="shForn" onclick="event.stopPropagation()">
-  <div class="shdl"></div><div class="sht">Novo fornecedor<button class="shclose" onclick="fecharSheet('shForn')">✕</button></div>
+  <div class="shdl"></div><div class="sht" id="shFornTitulo">Novo fornecedor<button class="shclose" onclick="fecharSheet('shForn')">✕</button></div>
   <div class="shb">
+    <input type="hidden" id="fIdx" value="-1">
     <div class="fg"><label class="fl">Razão social</label><input type="text" id="fNome" placeholder="Razão social completa"></div>
     <div class="fg"><label class="fl">CNPJ</label><input type="text" id="fCnpj" placeholder="00.000.000/0001-00" maxlength="18" inputmode="numeric" oninput="formatarCNPJInput(this)"></div>
     <div class="fg"><label class="fl">Especialidade</label><input type="text" id="fEspec" placeholder="Ex.: Padrões de referência, solventes HPLC"></div>
@@ -443,7 +444,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="fg"><label class="fl">Contato / e-mail</label><input type="text" id="fCont" placeholder="contato@fornecedor.com.br"></div>
     <div class="fg"><label class="fl">Periodicidade de reavaliação</label><select id="fPer"><option>Anual</option><option>Semestral</option><option>A cada 2 anos</option></select></div>
     <div class="fg"><label class="fl">Observações de qualificação</label><textarea id="fObs" placeholder="Critérios de qualificação, documentos recebidos..."></textarea></div>
-    <button class="btn btp btf" onclick="salvarForn()"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
+    <button class="btn btp btf" onclick="salvarForn()" id="btnSalvarForn"><i class="ti ti-check"></i>Cadastrar fornecedor</button>
   </div>
 </div></div>
 
@@ -1391,14 +1392,68 @@ function sincFornIns(idx){
   emailEl.value=opt.dataset.email||'';
 }
 
+function novoForn(){
+  sv('fIdx','-1');
+  clr(['fNome','fCnpj','fEspec','fCont','fObs']);
+  // remover opção temporária de status, se existir
+  var selStat=document.getElementById('fStat');
+  if(selStat){
+    Array.prototype.slice.call(selStat.querySelectorAll('option[data-temp="1"]')).forEach(function(o){ o.remove(); });
+    selStat.value='Em qualificação';
+  }
+  sv('fPer','Anual');
+  document.getElementById('shFornTitulo').childNodes[0].textContent='Novo fornecedor';
+  document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Cadastrar fornecedor';
+  abrirSheet('shForn');
+}
+
+function editarForn(idx){
+  var forns=DB.get('fornecedores')||[];
+  var f=forns[idx]; if(!f) return;
+  sv('fIdx', idx);
+  sv('fNome', f.nome||'');
+  sv('fCnpj', f.cnpj||'');
+  sv('fEspec', f.espec||'');
+  sv('fMat', f.matriz||'');
+  sv('fCont', f.contato||'');
+  sv('fPer', f.period||'Anual');
+  sv('fObs', f.obs||'');
+  var selStat=document.getElementById('fStat');
+  if(selStat){
+    Array.prototype.slice.call(selStat.querySelectorAll('option[data-temp="1"]')).forEach(function(o){ o.remove(); });
+    var match=false;
+    for(var i=0;i<selStat.options.length;i++){ if(selStat.options[i].value===f.status){ match=true; break; } }
+    if(!match && f.status){
+      var o=document.createElement('option'); o.value=f.status; o.textContent=f.status; o.dataset.temp='1';
+      selStat.appendChild(o);
+    }
+    selStat.value=f.status||'Em qualificação';
+  }
+  document.getElementById('shFornTitulo').childNodes[0].textContent='Editar fornecedor';
+  document.getElementById('btnSalvarForn').innerHTML='<i class="ti ti-check"></i>Salvar alterações';
+  fecharDetalhe('dForn');
+  abrirSheet('shForn');
+}
+
 function salvarForn(){
   var nome=gv('fNome').trim();
   if(!nome){ toast('Preencha a razão social'); return; }
-  DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:gv('fStat'),contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,avaliacoes:[],criadoEm:new Date().toISOString()});
+  var idx=parseInt(document.getElementById('fIdx').value);
+  var forns=DB.get('fornecedores')||[];
+  if(!isNaN(idx) && idx>=0 && forns[idx]){
+    var f=forns[idx];
+    f.nome=nome; f.cnpj=gv('fCnpj'); f.espec=gv('fEspec'); f.matriz=gv('fMat');
+    f.status=gv('fStat'); f.contato=gv('fCont'); f.period=gv('fPer'); f.obs=gv('fObs');
+    forns[idx]=f;
+    DB.set('fornecedores',forns);
+    toast(nome+' atualizado ✓');
+  } else {
+    DB.push('fornecedores',{nome:nome,cnpj:gv('fCnpj'),espec:gv('fEspec'),matriz:gv('fMat'),status:gv('fStat'),contato:gv('fCont'),period:gv('fPer'),obs:gv('fObs'),nota:0,avaliacoes:[],criadoEm:new Date().toISOString()});
+    toast(nome+' cadastrado ✓');
+  }
   fecharSheet('shForn');
-  clr(['fNome','fCnpj','fEspec','fCont','fObs']);
+  clr(['fNome','fCnpj','fEspec','fCont','fObs']); sv('fIdx','-1');
   renderForn(); renderDash(); atualizarFornSelect(); atualizarFornSelectReq();
-  toast(nome+' cadastrado ✓');
 }
 
 function renderForn(busca, ordem){
@@ -1497,7 +1552,8 @@ function verFornDetalhe(idx){
     +critHtml
     +'<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Histórico de avaliações</div>'
     +'<div class="card" style="margin-bottom:13px">'+avalHtml+'</div>'
-    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>Nova avaliação</button>';
+    +'<div style="display:flex;gap:8px"><button class="btn bto btf" onclick="editarForn('+idx+')"><i class="ti ti-pencil"></i>Editar</button>'
+    +'<button class="btn btp btf" onclick="prepAval('+idx+')"><i class="ti ti-star"></i>Nova avaliação</button></div>';
   abrirDetalhe('dForn');
 }
 
